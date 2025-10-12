@@ -1,103 +1,113 @@
-import Image from "next/image";
+import Link from "next/link";
 
-export default function Home() {
+import { PostListSection } from "@/components/posts/PostListSection";
+import { CategoryGrid } from "@/components/posts/CategoryGrid";
+import { TagCloud } from "@/components/posts/TagCloud";
+import { formatDate } from "@/lib/format";
+import { getServerContainer } from "@/server/get-container";
+
+export const revalidate = 120;
+
+export default async function Home() {
+  const {
+    services: { content },
+  } = getServerContainer();
+
+  const { latest, popular, categories, tags } = await content.getHomeContent();
+  const featured = latest[0];
+  const latestRest = latest.slice(1);
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <main className="min-h-screen bg-background text-foreground">
+      <section className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 pb-16 pt-20 sm:flex-row sm:items-center sm:justify-between">
+        <div className="max-w-2xl space-y-6">
+          <p className="text-sm font-medium uppercase tracking-[0.3em] text-emerald-500">Men&apos;s Stories</p>
+          <h1 className="text-balance text-4xl font-semibold leading-tight sm:text-5xl">
+            男性のリアルな体験談を、読みやすく。キャリア・健康・人間関係まで、共感しやすいストーリーをお届けします。
+          </h1>
+          <p className="text-pretty text-base text-foreground/70">
+            業界の最前線で働く人の副業術から、心と身体を整えるセルフケアまで。課題に直面したときの思考法を共有し、次の一歩を応援します。
+          </p>
+          <div className="flex flex-wrap gap-4">
+            <Link
+              href="/search"
+              className="inline-flex items-center justify-center rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background transition hover:opacity-85"
+            >
+              記事を検索する
+            </Link>
+            <Link
+              href="/category/career"
+              className="inline-flex items-center justify-center rounded-full border border-foreground/20 px-6 py-3 text-sm font-semibold text-foreground transition hover:border-emerald-400 hover:text-emerald-500"
+            >
+              カテゴリ一覧を見る
+            </Link>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+        {featured ? (
+          <Link
+            href={`/posts/${featured.slug}`}
+            className="group mt-6 w-full max-w-md rounded-3xl border border-foreground/10 bg-background/80 p-6 shadow-lg shadow-black/5 transition hover:-translate-y-1 hover:border-emerald-400 hover:shadow-xl"
+          >
+            <p className="text-xs uppercase tracking-[0.3em] text-emerald-500">Latest</p>
+            <h2 className="mt-3 text-2xl font-semibold leading-tight text-foreground transition group-hover:text-emerald-500">
+              {featured.title}
+            </h2>
+            <p className="mt-4 line-clamp-3 text-sm text-foreground/70">{featured.excerpt}</p>
+            <div className="mt-5 flex items-center justify-between text-xs text-foreground/60">
+              <span>{formatDate(featured.publishedAt)}</span>
+              <span>{featured.readTime}分で読了</span>
+            </div>
+          </Link>
+        ) : null}
+      </section>
+
+      <section className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 pb-20">
+        {latestRest.length ? (
+          <PostListSection
+            title="新着記事"
+            description="最新の体験談を毎週更新。通勤やスキマ時間にどうぞ。"
+            posts={latestRest}
+            cta={
+              <Link
+                href="/search?q=&page=1"
+                className="rounded-full border border-foreground/20 px-4 py-2 text-sm font-semibold text-foreground transition hover:border-emerald-400 hover:text-emerald-500"
+              >
+                すべて見る
+              </Link>
+            }
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        ) : null}
+
+        <PostListSection
+          title="よく読まれている記事"
+          description="読了時間の長い人気コンテンツをピックアップ。"
+          posts={popular}
+        />
+
+        <section className="flex flex-col gap-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-semibold text-foreground">カテゴリから探す</h2>
+              <p className="mt-1 text-sm text-foreground/70">興味のある領域をクリックすると該当記事が表示されます。</p>
+            </div>
+            <Link
+              href="/search"
+              className="rounded-full border border-foreground/20 px-4 py-2 text-sm font-semibold text-foreground transition hover:border-emerald-400 hover:text-emerald-500"
+            >
+              検索で絞り込む
+            </Link>
+          </div>
+          <CategoryGrid categories={categories} />
+        </section>
+
+        <section className="flex flex-col gap-4">
+          <div>
+            <h2 className="text-2xl font-semibold text-foreground">タグクラウド</h2>
+            <p className="mt-1 text-sm text-foreground/70">気になるテーマから新しい記事を見つけましょう。</p>
+          </div>
+          <TagCloud tags={tags} />
+        </section>
+      </section>
+    </main>
   );
 }
