@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { getServerContainer } from "@/server/get-container";
 
-export async function GET(_request: NextRequest, context: { params: { slug: string } }) {
+export async function GET(_request: NextRequest, context: { params: Promise<{ slug: string }> }) {
   const session = await auth();
 
   if (!session?.user) {
@@ -11,7 +11,7 @@ export async function GET(_request: NextRequest, context: { params: { slug: stri
   }
 
   const { services } = getServerContainer();
-  const { slug } = context.params;
+  const { slug } = await context.params;
 
   const result = await services.ownership.checkOwnership(session.user.id, slug);
 

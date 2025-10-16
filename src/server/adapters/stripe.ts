@@ -88,7 +88,7 @@ export class StripeSdkAdapter implements StripeAdapter {
   }
 }
 
-export function createStripeAdapter(apiKey: string, apiVersion: Stripe.StripeConfig["apiVersion"] = "2024-06-20") {
+export function createStripeAdapter(apiKey: string, apiVersion: Stripe.StripeConfig["apiVersion"] = "2025-08-27.basil") {
   if (process.env.STRIPE_MOCK === "true") {
     return new MockStripeAdapter();
   }
@@ -132,7 +132,7 @@ class MockStripeAdapter implements StripeAdapter {
     return session;
   }
 
-  constructWebhookEvent() {
+  constructWebhookEvent(): Stripe.Event {
     throw new Error("Mock Stripe webhook not implemented");
   }
 }

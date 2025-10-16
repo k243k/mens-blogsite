@@ -194,45 +194,49 @@ export class PrismaPostRepository implements PostRepository {
   private buildWhereClause(filters: SearchFilters = {}) {
     const { query, categorySlug, tagSlug } = filters;
 
+    const conditions: Prisma.PostWhereInput[] = [];
+
+    if (query) {
+      conditions.push({
+        OR: [
+          { title: { contains: query, mode: "insensitive" } },
+          { excerpt: { contains: query, mode: "insensitive" } },
+          { body: { contains: query, mode: "insensitive" } },
+          {
+            tags: {
+              some: {
+                tag: { name: { contains: query, mode: "insensitive" } },
+              },
+            },
+          },
+        ],
+      });
+    }
+
+    if (categorySlug) {
+      conditions.push({
+        categories: {
+          some: {
+            category: { slug: categorySlug },
+          },
+        },
+      });
+    }
+
+    if (tagSlug) {
+      conditions.push({
+        tags: {
+          some: {
+            tag: { slug: tagSlug },
+          },
+        },
+      });
+    }
+
     return {
       status: "PUBLISHED" as const,
       publishedAt: { lte: new Date() },
-      AND: [
-        query
-          ? {
-              OR: [
-                { title: { contains: query, mode: "insensitive" } },
-                { excerpt: { contains: query, mode: "insensitive" } },
-                { body: { contains: query, mode: "insensitive" } },
-                {
-                  tags: {
-                    some: {
-                      tag: { name: { contains: query, mode: "insensitive" } },
-                    },
-                  },
-                },
-              ],
-            }
-          : undefined,
-        categorySlug
-          ? {
-              categories: {
-                some: {
-                  category: { slug: categorySlug },
-                },
-              },
-            }
-          : undefined,
-        tagSlug
-          ? {
-              tags: {
-                some: {
-                  tag: { slug: tagSlug },
-                },
-              },
-            }
-          : undefined,
-      ].filter(Boolean),
+      AND: conditions.length > 0 ? conditions : undefined,
     } satisfies Prisma.PostWhereInput;
   }
 
@@ -245,6 +249,7 @@ export class PrismaPostRepository implements PostRepository {
     isPaid: true,
     priceJPY: true,
     readTime: true,
+    coverImage: true,
     stripeProductId: true,
     stripePriceId: true,
     stripePriceAmount: true,
@@ -285,7 +290,22 @@ export class PrismaPostRepository implements PostRepository {
     },
   } satisfies Prisma.PostSelect;
 
-  private mapToSummary(post: Prisma.PostGetPayload<{ select: typeof this.summarySelection }>): PostSummary {
+  private mapToSummary(post: {
+    id: string;
+    slug: string;
+    title: string;
+    excerpt: string;
+    publishedAt: Date | null;
+    isPaid: boolean;
+    priceJPY: number;
+    readTime: number;
+    coverImage: string | null;
+    stripeProductId: string | null;
+    stripePriceId: string | null;
+    stripePriceAmount: number | null;
+    categories: Array<{ category: { slug: string; name: string } }>;
+    tags: Array<{ tag: { slug: string; name: string } }>;
+  }): PostSummary {
     return {
       ...post,
       categories: post.categories.map((item) => item.category),

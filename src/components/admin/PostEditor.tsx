@@ -20,9 +20,9 @@ const formSchema = z.object({
   body: z.string().min(1, "本文を入力してください"),
   status: z.nativeEnum(PostStatus),
   publishedAt: z.union([z.string().datetime(), z.literal(""), z.null()]).optional(),
-  isPaid: z.boolean().default(false),
-  priceJPY: z.coerce.number().int().nonnegative(),
-  readTime: z.coerce.number().int().min(1, "読了時間は1以上で設定してください"),
+  isPaid: z.boolean(),
+  priceJPY: z.number().int().nonnegative(),
+  readTime: z.number().int().min(1, "読了時間は1以上で設定してください"),
   coverImage: z.union([z.string().url(), z.literal(""), z.null()]).optional(),
   commentsEnabled: z.boolean().optional(),
   categoryIds: z.array(z.string()),
@@ -235,7 +235,7 @@ export function PostEditor({ mode, authorId, categories, tags, initialValues }: 
                   type="number"
                   min={1}
                   className="flex-1 rounded-xl border border-foreground/15 bg-background px-3 py-2"
-                  {...register("readTime")}
+                  {...register("readTime", { valueAsNumber: true })}
                 />
               </label>
               <label className="flex items-center gap-3">
@@ -259,7 +259,7 @@ export function PostEditor({ mode, authorId, categories, tags, initialValues }: 
                   min={0}
                   disabled={!isPaid}
                   className="flex-1 rounded-xl border border-foreground/15 bg-background px-3 py-2 disabled:bg-foreground/10"
-                  {...register("priceJPY")}
+                  {...register("priceJPY", { valueAsNumber: true })}
                 />
               </label>
             </div>

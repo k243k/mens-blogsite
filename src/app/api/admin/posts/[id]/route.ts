@@ -9,13 +9,13 @@ const paramsSchema = z.object({
   id: z.string().cuid(),
 });
 
-export async function GET(_request: NextRequest, context: { params: { id: string } }) {
+export async function GET(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (session?.user.role !== "ADMIN") {
     return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
   }
 
-  const parseParams = paramsSchema.safeParse(context.params);
+  const parseParams = paramsSchema.safeParse(await context.params);
   if (!parseParams.success) {
     return NextResponse.json({ error: "INVALID_PARAMS" }, { status: 400 });
   }
@@ -30,13 +30,13 @@ export async function GET(_request: NextRequest, context: { params: { id: string
   return NextResponse.json(post);
 }
 
-export async function PATCH(request: NextRequest, context: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (session?.user.role !== "ADMIN") {
     return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
   }
 
-  const parseParams = paramsSchema.safeParse(context.params);
+  const parseParams = paramsSchema.safeParse(await context.params);
   if (!parseParams.success) {
     return NextResponse.json({ error: "INVALID_PARAMS" }, { status: 400 });
   }
@@ -51,15 +51,16 @@ export async function PATCH(request: NextRequest, context: { params: { id: strin
   const { services } = getServerContainer();
 
   try {
+    const { publishedAt, ...restData } = parseResult.data;
     const normalizedPublishedAt =
-      parseResult.data.publishedAt === null
+      publishedAt === null
         ? null
-        : parseResult.data.publishedAt
-        ? new Date(parseResult.data.publishedAt)
+        : publishedAt
+        ? new Date(publishedAt)
         : undefined;
 
     const updated = await services.adminPost.update({
-      ...parseResult.data,
+      ...restData,
       ...(normalizedPublishedAt !== undefined ? { publishedAt: normalizedPublishedAt } : {}),
     });
 
@@ -70,13 +71,13 @@ export async function PATCH(request: NextRequest, context: { params: { id: strin
   }
 }
 
-export async function DELETE(_request: NextRequest, context: { params: { id: string } }) {
+export async function DELETE(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (session?.user.role !== "ADMIN") {
     return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
   }
 
-  const parseParams = paramsSchema.safeParse(context.params);
+  const parseParams = paramsSchema.safeParse(await context.params);
   if (!parseParams.success) {
     return NextResponse.json({ error: "INVALID_PARAMS" }, { status: 400 });
   }

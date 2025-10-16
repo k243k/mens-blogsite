@@ -8,11 +8,11 @@ import { getServerContainer } from "@/server/get-container";
 const PAGE_SIZE = 6;
 export const revalidate = 120;
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const {
     services: { content },
   } = getServerContainer();
-  const category = await content.getCategory(params.slug);
+  const category = await content.getCategory((await params).slug);
 
   if (!category) {
     return {
@@ -30,11 +30,11 @@ export default async function CategoryPage({
   params,
   searchParams,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
   searchParams?: { page?: string };
 }) {
   const container = getServerContainer();
-  const category = await container.services.content.getCategory(params.slug);
+  const category = await container.services.content.getCategory((await params).slug);
 
   if (!category) {
     notFound();
@@ -43,7 +43,7 @@ export default async function CategoryPage({
   const currentPage = Math.max(Number(searchParams?.page ?? 1), 1);
 
   const result = await container.services.search.search(
-    { categorySlug: params.slug },
+    { categorySlug: (await params).slug },
     { page: currentPage, pageSize: PAGE_SIZE },
   );
 
@@ -66,7 +66,7 @@ export default async function CategoryPage({
         </div>
 
         <Pagination
-          basePath={`/category/${params.slug}`}
+          basePath={`/category/${(await params).slug}`}
           currentPage={currentPage}
           totalPages={totalPages}
         />

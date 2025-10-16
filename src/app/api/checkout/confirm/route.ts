@@ -25,6 +25,9 @@ export async function POST(request: NextRequest) {
   }
 
   const container = getServerContainer();
+  if (!container.services.checkout) {
+    return NextResponse.json({ error: "CHECKOUT_NOT_CONFIGURED" }, { status: 503 });
+  }
   const result = await container.services.checkout.confirmSession(json.sessionId, session.user.id);
 
   if (!result.ok) {

@@ -22,7 +22,7 @@ const settingsSchema = z.object({
     partnerId: z.string().min(1, "パートナーIDを入力してください"),
   }),
   comments: z.object({
-    enabled: z.boolean().default(false),
+    enabled: z.boolean(),
   }),
 });
 

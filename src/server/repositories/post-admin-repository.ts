@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { type PostStatus, Prisma, PrismaClient } from "@prisma/client";
 
 import type {
   PostAdminCreateInput,
@@ -37,7 +37,7 @@ export class PrismaPostAdminRepository implements PostAdminRepository {
     ]);
 
     return {
-      items: items.map(this.mapPost),
+      items: items.map((post) => this.mapPost(post)),
       total,
     };
   }
@@ -175,6 +175,7 @@ export class PrismaPostAdminRepository implements PostAdminRepository {
     status: true,
     isPaid: true,
     priceJPY: true,
+    readTime: true,
     publishedAt: true,
     updatedAt: true,
     author: {
@@ -221,7 +222,18 @@ export class PrismaPostAdminRepository implements PostAdminRepository {
     },
   } satisfies Prisma.PostSelect;
 
-  private mapPost(post: Prisma.PostGetPayload<{ select: typeof this.selection }>): PostAdminListItem {
+  private mapPost(post: {
+    id: string;
+    slug: string;
+    title: string;
+    status: PostStatus;
+    publishedAt: Date | null;
+    isPaid: boolean;
+    priceJPY: number;
+    readTime: number;
+    updatedAt: Date;
+    author: { id: string; email: string };
+  }): PostAdminListItem {
     return {
       ...post,
     } satisfies PostAdminListItem;

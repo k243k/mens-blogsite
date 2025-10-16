@@ -8,11 +8,11 @@ import { getServerContainer } from "@/server/get-container";
 const PAGE_SIZE = 6;
 export const revalidate = 120;
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const {
     services: { content },
   } = getServerContainer();
-  const tag = await content.getTag(params.slug);
+  const tag = await content.getTag((await params).slug);
 
   if (!tag) {
     return {
@@ -30,11 +30,11 @@ export default async function TagPage({
   params,
   searchParams,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
   searchParams?: { page?: string };
 }) {
   const container = getServerContainer();
-  const tag = await container.services.content.getTag(params.slug);
+  const tag = await container.services.content.getTag((await params).slug);
 
   if (!tag) {
     notFound();
@@ -43,7 +43,7 @@ export default async function TagPage({
   const currentPage = Math.max(Number(searchParams?.page ?? 1), 1);
 
   const result = await container.services.search.search(
-    { tagSlug: params.slug },
+    { tagSlug: (await params).slug },
     { page: currentPage, pageSize: PAGE_SIZE },
   );
 
@@ -66,7 +66,7 @@ export default async function TagPage({
         </div>
 
         <Pagination
-          basePath={`/tag/${params.slug}`}
+          basePath={`/tag/${(await params).slug}`}
           currentPage={currentPage}
           totalPages={totalPages}
         />

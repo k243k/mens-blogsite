@@ -9,6 +9,7 @@ export type PostSummary = {
   isPaid: boolean;
   priceJPY: number;
   readTime: number;
+  coverImage: string | null;
   stripeProductId?: string | null;
   stripePriceId?: string | null;
   stripePriceAmount?: number | null;

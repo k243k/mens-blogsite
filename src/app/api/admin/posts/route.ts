@@ -41,15 +41,16 @@ export async function POST(request: NextRequest) {
   const { services } = getServerContainer();
 
   try {
+    const { publishedAt, ...restData } = parseResult.data;
     const normalizedPublishedAt =
-      parseResult.data.publishedAt === null
+      publishedAt === null
         ? null
-        : parseResult.data.publishedAt
-        ? new Date(parseResult.data.publishedAt)
+        : publishedAt
+        ? new Date(publishedAt)
         : undefined;
 
     const created = await services.adminPost.create({
-      ...parseResult.data,
+      ...restData,
       ...(normalizedPublishedAt !== undefined ? { publishedAt: normalizedPublishedAt } : {}),
     });
 

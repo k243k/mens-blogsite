@@ -11,7 +11,7 @@ function toInputDate(date: Date | null) {
   return iso.slice(0, 16);
 }
 
-export default async function AdminPostEditPage({ params }: { params: { id: string } }) {
+export default async function AdminPostEditPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session?.user) {
     notFound();
@@ -19,7 +19,7 @@ export default async function AdminPostEditPage({ params }: { params: { id: stri
 
   const container = getServerContainer();
   const [post, categories, tags] = await Promise.all([
-    container.services.adminPost.getEditable(params.id),
+    container.services.adminPost.getEditable((await params).id),
     container.services.content.listCategories(),
     container.services.content.listTags(),
   ]);

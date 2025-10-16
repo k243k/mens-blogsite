@@ -48,7 +48,11 @@ export function CommentSection({ postId, enabled }: { postId: string; enabled: b
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ postId, body }),
       });
-      const data = (await response.json().catch(() => ({}))) as { message?: string; error?: string };
+      const data = (await response.json().catch(() => ({}))) as {
+        message?: string;
+        error?: string;
+        comment?: { id: string; postId: string; body: string; status: string; createdAt: string };
+      };
       if (!response.ok) {
         setStatus(data.error ?? "現在コメントを受け付けていません。");
         return;
@@ -56,7 +60,8 @@ export function CommentSection({ postId, enabled }: { postId: string; enabled: b
       setBody("");
       setStatus(data.message ?? "コメントが送信されました。（ダミー）");
       if (data.comment) {
-        setComments((prev) => [deserializeComment(data.comment), ...prev]);
+        const comment = data.comment;
+        setComments((prev) => [deserializeComment(comment), ...prev]);
       }
     } catch (error) {
       console.error(error);

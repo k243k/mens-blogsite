@@ -1,5 +1,5 @@
 import type { Setting } from "@prisma/client";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 export interface SettingRepository {
   findByKey<T = unknown>(key: string): Promise<T | null>;
@@ -25,8 +25,8 @@ export class PrismaSettingRepository implements SettingRepository {
   upsert(key: string, value: unknown) {
     return this.prisma.setting.upsert({
       where: { key },
-      update: { value },
-      create: { key, value },
+      update: { value: value as Prisma.InputJsonValue },
+      create: { key, value: value as Prisma.InputJsonValue },
     });
   }
 }

@@ -29,11 +29,11 @@ function buildPreview(body: string, fallback: string) {
   return segments.slice(0, 3).join("\n\n");
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const {
     repositories: { post },
   } = getServerContainer();
-  const summary = await post.findPublishedBySlug(params.slug);
+  const summary = await post.findPublishedBySlug((await params).slug);
 
   if (!summary) {
     return {
@@ -72,11 +72,11 @@ export default async function PostPage({
   params,
   searchParams,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
   searchParams?: { status?: string; session_id?: string };
 }) {
   const container = getServerContainer();
-  const detail = await container.services.content.getPostDetail(params.slug);
+  const detail = await container.services.content.getPostDetail((await params).slug);
 
   if (!detail) {
     notFound();
@@ -88,7 +88,8 @@ export default async function PostPage({
   if (
     searchParams?.status === "success" &&
     searchParams.session_id &&
-    session?.user
+    session?.user &&
+    container.services.checkout
   ) {
     await container.services.checkout.confirmSession(searchParams.session_id, session.user.id);
   }
@@ -104,7 +105,7 @@ export default async function PostPage({
 
   let hasAccess = !detail.post.isPaid;
   if (detail.post.isPaid && session?.user) {
-    const ownership = await container.services.ownership.checkOwnership(session.user.id, params.slug);
+    const ownership = await container.services.ownership.checkOwnership(session.user.id, (await params).slug);
     hasAccess = ownership.hasAccess;
   }
 

@@ -13,21 +13,22 @@ function createTocPlugin(headings: TocItem[]) {
   return () => {
     const slugger = new GithubSlugger();
     return (tree: Root) => {
-      visit<Heading>(tree, "heading", (node) => {
-        if (!node || typeof node.depth !== "number") return;
-        if (node.depth < 2 || node.depth > 3) return;
+      visit(tree, "heading", (node) => {
+        const heading = node as Heading;
+        if (!heading || typeof heading.depth !== "number") return;
+        if (heading.depth < 2 || heading.depth > 3) return;
 
-        const title = toString(node);
+        const title = toString(heading);
         if (!title) return;
         const id = slugger.slug(title);
-        const data = (node.data ??= {});
+        const data = (heading.data ??= {});
         (data as Record<string, unknown>).id = id;
-        const hProperties = ((data as Record<string, unknown>).hProperties ??= {} as Record<string, unknown>);
+        const hProperties = ((data as Record<string, unknown>).hProperties ??= {} as Record<string, unknown>) as Record<string, unknown>;
         hProperties.id = id;
         headings.push({
           id,
           title,
-          level: node.depth,
+          level: heading.depth,
         });
       });
     };

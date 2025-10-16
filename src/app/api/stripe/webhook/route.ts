@@ -22,15 +22,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "WEBHOOK_SECRET_NOT_SET" }, { status: 503 });
   }
 
-  let event;
   try {
-    event = adapters.stripe.constructWebhookEvent(rawBody, signature, webhookSecret);
+    const event = adapters.stripe.constructWebhookEvent(rawBody, signature, webhookSecret);
+    await services.purchase.recordStripePurchase(event);
   } catch (error) {
     console.error("Stripe webhook signature verification failed", error);
     return NextResponse.json({ error: "INVALID_SIGNATURE" }, { status: 400 });
   }
-
-  await services.purchase.recordStripePurchase(event);
 
   return NextResponse.json({ received: true });
 }

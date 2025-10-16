@@ -12,6 +12,7 @@ export type PostAdminListItem = {
   status: PostStatus;
   isPaid: boolean;
   priceJPY: number;
+  readTime: number;
   publishedAt: Date | null;
   updatedAt: Date;
   author: {
