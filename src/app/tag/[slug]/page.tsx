@@ -34,16 +34,16 @@ export default async function TagPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams?: { page?: string };
+  searchParams?: Promise<{ page?: string }>;
 }) {
-  const { slug } = await params;
+  const [{ slug }, resolvedSearchParams] = await Promise.all([params, searchParams]);
   const tag = getTagSummary(slug);
 
   if (!tag) {
     notFound();
   }
 
-  const currentPage = Math.max(Number(searchParams?.page ?? 1), 1);
+  const currentPage = Math.max(Number(resolvedSearchParams?.page ?? 1), 1);
   const result = searchPosts({ tagSlug: slug }, currentPage, PAGE_SIZE);
   const totalPages = Math.max(Math.ceil(result.total / PAGE_SIZE), 1);
 

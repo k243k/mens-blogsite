@@ -34,16 +34,16 @@ export default async function CategoryPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams?: { page?: string };
+  searchParams?: Promise<{ page?: string }>;
 }) {
-  const { slug } = await params;
+  const [{ slug }, resolvedSearchParams] = await Promise.all([params, searchParams]);
   const category = getCategorySummary(slug);
 
   if (!category) {
     notFound();
   }
 
-  const currentPage = Math.max(Number(searchParams?.page ?? 1), 1);
+  const currentPage = Math.max(Number(resolvedSearchParams?.page ?? 1), 1);
   const result = searchPosts({ categorySlug: slug }, currentPage, PAGE_SIZE);
   const totalPages = Math.max(Math.ceil(result.total / PAGE_SIZE), 1);
 
