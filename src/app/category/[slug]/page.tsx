@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { UnsafeUnwrappedSearchParams } from "next/dist/server/request/search-params";
 
 import { PostCard } from "@/components/posts/PostCard";
 import { getAllCategories, getCategorySummary, searchPosts } from "@/content/api";
@@ -36,7 +37,10 @@ export default async function CategoryPage({
   params: Promise<{ slug: string }>;
   searchParams?: Promise<{ page?: string }>;
 }) {
-  const [{ slug }, resolvedSearchParams] = await Promise.all([params, searchParams]);
+  const { slug } = await params;
+  const resolvedSearchParams = searchParams
+    ? (searchParams as unknown as UnsafeUnwrappedSearchParams<typeof searchParams>)
+    : undefined;
   const category = getCategorySummary(slug);
 
   if (!category) {
