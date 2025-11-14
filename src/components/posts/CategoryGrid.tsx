@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import type { CategorySummary } from "@/server/repositories/category-repository";
+import type { CategorySummary } from "@/content/types";
 
 export function CategoryGrid({ categories }: { categories: CategorySummary[] }) {
   return (

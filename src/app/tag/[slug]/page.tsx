@@ -3,16 +3,19 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PostCard } from "@/components/posts/PostCard";
-import { getServerContainer } from "@/server/get-container";
+import { getAllTags, getTagSummary, searchPosts } from "@/content/api";
 
 const PAGE_SIZE = 6;
 export const revalidate = 120;
+export const dynamicParams = false;
+
+export async function generateStaticParams() {
+  return getAllTags().map((tag) => ({ slug: tag.slug }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const {
-    services: { content },
-  } = getServerContainer();
-  const tag = await content.getTag((await params).slug);
+  const { slug } = await params;
+  const tag = getTagSummary(slug);
 
   if (!tag) {
     return {
@@ -23,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `#${tag.name} の記事一覧 | Men's Blogsite`,
     description: `タグ「${tag.name}」に関連する記事一覧です。`,
-  } satisfies Metadata;
+  };
 }
 
 export default async function TagPage({
@@ -33,20 +36,15 @@ export default async function TagPage({
   params: Promise<{ slug: string }>;
   searchParams?: { page?: string };
 }) {
-  const container = getServerContainer();
-  const tag = await container.services.content.getTag((await params).slug);
+  const { slug } = await params;
+  const tag = getTagSummary(slug);
 
   if (!tag) {
     notFound();
   }
 
   const currentPage = Math.max(Number(searchParams?.page ?? 1), 1);
-
-  const result = await container.services.search.search(
-    { tagSlug: (await params).slug },
-    { page: currentPage, pageSize: PAGE_SIZE },
-  );
-
+  const result = searchPosts({ tagSlug: slug }, currentPage, PAGE_SIZE);
   const totalPages = Math.max(Math.ceil(result.total / PAGE_SIZE), 1);
 
   return (
@@ -65,11 +63,7 @@ export default async function TagPage({
           {!result.items.length ? <p className="text-sm text-foreground/60">まだ記事がありません。</p> : null}
         </div>
 
-        <Pagination
-          basePath={`/tag/${(await params).slug}`}
-          currentPage={currentPage}
-          totalPages={totalPages}
-        />
+        <Pagination basePath={`/tag/${slug}`} currentPage={currentPage} totalPages={totalPages} />
       </section>
     </main>
   );

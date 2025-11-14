@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "Men's Blogsite",
   description:
     "男性向け体験談を丁寧に届けるためのNext.jsブログプラットフォームのプロトタイプです。",
-  metadataBase: new URL("https://example.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.com"),
 };
 
 export default function RootLayout({

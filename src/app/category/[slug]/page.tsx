@@ -3,16 +3,19 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PostCard } from "@/components/posts/PostCard";
-import { getServerContainer } from "@/server/get-container";
+import { getAllCategories, getCategorySummary, searchPosts } from "@/content/api";
 
 const PAGE_SIZE = 6;
 export const revalidate = 120;
+export const dynamicParams = false;
+
+export async function generateStaticParams() {
+  return getAllCategories().map((category) => ({ slug: category.slug }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const {
-    services: { content },
-  } = getServerContainer();
-  const category = await content.getCategory((await params).slug);
+  const { slug } = await params;
+  const category = getCategorySummary(slug);
 
   if (!category) {
     return {
@@ -23,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${category.name} の記事一覧 | Men's Blogsite`,
     description: `${category.name} に関する最新の体験談を紹介します。`,
-  } satisfies Metadata;
+  };
 }
 
 export default async function CategoryPage({
@@ -33,20 +36,15 @@ export default async function CategoryPage({
   params: Promise<{ slug: string }>;
   searchParams?: { page?: string };
 }) {
-  const container = getServerContainer();
-  const category = await container.services.content.getCategory((await params).slug);
+  const { slug } = await params;
+  const category = getCategorySummary(slug);
 
   if (!category) {
     notFound();
   }
 
   const currentPage = Math.max(Number(searchParams?.page ?? 1), 1);
-
-  const result = await container.services.search.search(
-    { categorySlug: (await params).slug },
-    { page: currentPage, pageSize: PAGE_SIZE },
-  );
-
+  const result = searchPosts({ categorySlug: slug }, currentPage, PAGE_SIZE);
   const totalPages = Math.max(Math.ceil(result.total / PAGE_SIZE), 1);
 
   return (
@@ -65,11 +63,7 @@ export default async function CategoryPage({
           {!result.items.length ? <p className="text-sm text-foreground/60">まだ記事がありません。</p> : null}
         </div>
 
-        <Pagination
-          basePath={`/category/${(await params).slug}`}
-          currentPage={currentPage}
-          totalPages={totalPages}
-        />
+        <Pagination basePath={`/category/${slug}`} currentPage={currentPage} totalPages={totalPages} />
       </section>
     </main>
   );

@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import type { TagSummary } from "@/server/repositories/tag-repository";
+import type { TagSummary } from "@/content/types";
 
 export function TagCloud({ tags }: { tags: TagSummary[] }) {
   if (!tags.length) {

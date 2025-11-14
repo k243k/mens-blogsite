@@ -1,5 +1,5 @@
 import { PostCard } from "@/components/posts/PostCard";
-import type { PostSummary } from "@/server/types/post";
+import type { PostSummary } from "@/content/types";
 
 export function PostListSection({
   title,

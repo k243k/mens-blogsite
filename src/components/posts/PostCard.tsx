@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { formatDate, formatPriceJPY } from "@/lib/format";
-import type { PostSummary } from "@/server/types/post";
+import type { PostSummary } from "@/content/types";
 
 function PaidBadge({ isPaid, price }: { isPaid: boolean; price: number }) {
   if (!isPaid) {

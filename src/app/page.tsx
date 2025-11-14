@@ -3,17 +3,13 @@ import Link from "next/link";
 import { PostListSection } from "@/components/posts/PostListSection";
 import { CategoryGrid } from "@/components/posts/CategoryGrid";
 import { TagCloud } from "@/components/posts/TagCloud";
+import { getHomeContent } from "@/content/api";
 import { formatDate } from "@/lib/format";
-import { getServerContainer } from "@/server/get-container";
 
 export const revalidate = 120;
 
-export default async function Home() {
-  const {
-    services: { content },
-  } = getServerContainer();
-
-  const { latest, popular, categories, tags } = await content.getHomeContent();
+export default function Home() {
+  const { latest, popular, categories, tags } = getHomeContent();
   const featured = latest[0];
   const latestRest = latest.slice(1);
 

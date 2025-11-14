@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import type { TocItem } from "@/server/types/post";
+import type { TocItem } from "@/content/types";
 
 export function TableOfContents({ items }: { items: TocItem[] }) {
   const [activeId, setActiveId] = useState<string | null>(null);
