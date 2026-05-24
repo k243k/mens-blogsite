@@ -1,109 +1,109 @@
 import Link from "next/link";
 
-import { PostListSection } from "@/components/posts/PostListSection";
-import { CategoryGrid } from "@/components/posts/CategoryGrid";
-import { TagCloud } from "@/components/posts/TagCloud";
-import { getHomeContent } from "@/content/api";
-import { formatDate } from "@/lib/format";
+import { Footer } from "@/components/layout/Footer";
+import { Header } from "@/components/layout/Header";
+import { ReviewCard } from "@/components/review/ReviewCard";
+import { Button } from "@/components/ui/Button";
+import { getAllAreas, getAllPublishedReviews } from "@/lib/repository/public";
 
-export const revalidate = 120;
-
-export default function Home() {
-  const { latest, popular, categories, tags } = getHomeContent();
-  const featured = latest[0];
-  const latestRest = latest.slice(1);
+/**
+ * トップページ。
+ * 出典: design-spec §8.1 / requirements §5.1。
+ * データはビルド時に Supabase（public_reviews_for_build / areas）から取得（無料情報のみ）。
+ */
+export default async function HomePage() {
+  const [reviews, areas] = await Promise.all([getAllPublishedReviews(), getAllAreas()]);
+  const topAreas = areas.filter((a) => a.parentSlug === null);
+  const latest = reviews.slice(0, 6);
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <section className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 pb-16 pt-20 sm:flex-row sm:items-center sm:justify-between">
-        <div className="max-w-2xl space-y-6">
-          <p className="text-sm font-medium uppercase tracking-[0.3em] text-emerald-500">Men&apos;s Stories</p>
-          <h1 className="text-balance text-4xl font-semibold leading-tight sm:text-5xl">
-            男性のリアルな体験談を、読みやすく。キャリア・健康・人間関係まで、共感しやすいストーリーをお届けします。
-          </h1>
-          <p className="text-pretty text-base text-foreground/70">
-            業界の最前線で働く人の副業術から、心と身体を整えるセルフケアまで。課題に直面したときの思考法を共有し、次の一歩を応援します。
+    <>
+      <Header />
+
+      <section className="relative overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(circle at 20% 20%, rgba(210,166,121,0.22), transparent 35%), radial-gradient(circle at 80% 30%, rgba(143,29,44,0.22), transparent 30%), linear-gradient(135deg, #0D0B0A, #181311 55%, #0D0B0A)",
+          }}
+        />
+        <div className="relative mx-auto max-w-[var(--container-lg)] px-5 py-24 sm:py-32">
+          <p className="text-xs font-semibold tracking-[0.25em] text-champagne-400">
+            MEN&apos;S ESTHE 本音レビュー
           </p>
-          <div className="flex flex-wrap gap-4">
-            <Link
-              href="/search"
-              className="inline-flex items-center justify-center rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background transition hover:opacity-85"
-            >
-              記事を検索する
-            </Link>
-            <Link
-              href="/category/career"
-              className="inline-flex items-center justify-center rounded-full border border-foreground/20 px-6 py-3 text-sm font-semibold text-foreground transition hover:border-emerald-400 hover:text-emerald-500"
-            >
-              カテゴリ一覧を見る
-            </Link>
+          <h1 className="mt-4 max-w-2xl text-4xl font-bold leading-tight text-ivory-100 sm:text-6xl">
+            今夜、外したくない
+            <br />
+            メンズエステ体験談。
+          </h1>
+          <p className="mt-5 max-w-xl text-sm leading-7 text-ivory-300 sm:text-base">
+            料金、雰囲気、清潔感、写真とのギャップまで。
+            <br />
+            行く前に知りたい本音を記録。
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Button href="#areas" variant="primary">エリアから探す</Button>
+            <Button href="/reviews" variant="secondary">高評価レビューを見る</Button>
           </div>
         </div>
-        {featured ? (
-          <Link
-            href={`/posts/${featured.slug}`}
-            className="group mt-6 w-full max-w-md rounded-3xl border border-foreground/10 bg-background/80 p-6 shadow-lg shadow-black/5 transition hover:-translate-y-1 hover:border-emerald-400 hover:shadow-xl"
-          >
-            <p className="text-xs uppercase tracking-[0.3em] text-emerald-500">Latest</p>
-            <h2 className="mt-3 text-2xl font-semibold leading-tight text-foreground transition group-hover:text-emerald-500">
-              {featured.title}
-            </h2>
-            <p className="mt-4 line-clamp-3 text-sm text-foreground/70">{featured.excerpt}</p>
-            <div className="mt-5 flex items-center justify-between text-xs text-foreground/60">
-              <span>{formatDate(featured.publishedAt)}</span>
-              <span>{featured.readTime}分で読了</span>
-            </div>
-          </Link>
-        ) : null}
       </section>
 
-      <section className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 pb-20">
-        {latestRest.length ? (
-          <PostListSection
-            title="新着記事"
-            description="最新の体験談を毎週更新。通勤やスキマ時間にどうぞ。"
-            posts={latestRest}
-            cta={
+      <div className="mx-auto max-w-[var(--container-lg)] px-5">
+        <section id="areas" className="scroll-mt-20 py-14">
+          <h2 className="text-2xl font-bold text-ivory-100">エリアから探す</h2>
+          <div className="mt-6 flex flex-wrap gap-3">
+            {topAreas.map((area) => (
               <Link
-                href="/search?q=&page=1"
-                className="rounded-full border border-foreground/20 px-4 py-2 text-sm font-semibold text-foreground transition hover:border-emerald-400 hover:text-emerald-500"
+                key={area.slug}
+                href={`/areas/${area.slug}`}
+                className="rounded-full border border-champagne-400/25 bg-night-850 px-5 py-2.5 text-sm font-bold text-ivory-100 transition hover:border-champagne-400/50 hover:bg-champagne-400/10"
               >
-                すべて見る
+                {area.name}
               </Link>
-            }
-          />
-        ) : null}
+            ))}
+          </div>
+        </section>
 
-        <PostListSection
-          title="よく読まれている記事"
-          description="読了時間の長い人気コンテンツをピックアップ。"
-          posts={popular}
-        />
-
-        <section className="flex flex-col gap-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-semibold text-foreground">カテゴリから探す</h2>
-              <p className="mt-1 text-sm text-foreground/70">興味のある領域をクリックすると該当記事が表示されます。</p>
-            </div>
-            <Link
-              href="/search"
-              className="rounded-full border border-foreground/20 px-4 py-2 text-sm font-semibold text-foreground transition hover:border-emerald-400 hover:text-emerald-500"
-            >
-              検索で絞り込む
+        <section className="py-6">
+          <div className="flex items-end justify-between">
+            <h2 className="text-2xl font-bold text-ivory-100">最新レビュー</h2>
+            <Link href="/reviews" className="text-sm text-champagne-300 hover:text-champagne-400">
+              すべて見る →
             </Link>
           </div>
-          <CategoryGrid categories={categories} />
+          {latest.length === 0 ? (
+            <p className="mt-6 text-sm text-ivory-500">公開中のレビューはまだありません。</p>
+          ) : (
+            <div className="mt-6 grid gap-6 [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))]">
+              {latest.map((review) => (
+                <ReviewCard key={review.id} review={review} />
+              ))}
+            </div>
+          )}
         </section>
 
-        <section className="flex flex-col gap-4">
-          <div>
-            <h2 className="text-2xl font-semibold text-foreground">タグクラウド</h2>
-            <p className="mt-1 text-sm text-foreground/70">気になるテーマから新しい記事を見つけましょう。</p>
+        <section className="py-14">
+          <div
+            className="overflow-hidden rounded-[var(--radius-card)] border border-champagne-400/25 p-10 text-center"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(13,11,10,0.95), rgba(143,29,44,0.3)), radial-gradient(circle at 30% 10%, rgba(210,166,121,0.2), transparent 40%)",
+            }}
+          >
+            <h2 className="text-2xl font-bold text-ivory-100 sm:text-3xl">行く前に、外さないために。</h2>
+            <p className="mx-auto mt-3 max-w-lg text-sm leading-7 text-ivory-300">
+              写真とのギャップ、再訪判断、初心者が注意すべき点。本音レビューで今夜の判断材料を。
+            </p>
+            <div className="mt-7 flex justify-center">
+              <Button href="/reviews" variant="primary">本音レビューを読む</Button>
+            </div>
           </div>
-          <TagCloud tags={tags} />
         </section>
-      </section>
-    </main>
+      </div>
+
+      <Footer />
+    </>
   );
 }

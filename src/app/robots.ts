@@ -1,4 +1,5 @@
-export const revalidate = 3600;
+// output: export では静的化を明示する必要がある（Next 16）。
+export const dynamic = "force-static";
 
 export default function robots() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -7,6 +8,7 @@ export default function robots() {
     rules: {
       userAgent: "*",
       allow: "/",
+      disallow: ["/admin", "/login"],
     },
     sitemap: `${baseUrl}/sitemap.xml`,
   };

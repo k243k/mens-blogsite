@@ -5,6 +5,11 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      job_id:
+        description: "rebuild_jobs.id（Edge Function から渡される。手動実行時は空でも可）"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -18,9 +23,21 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # 公開ビルド用（anon key のみ・公開可）。未設定なら build 内の検証で安全に失敗する。
+      NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Fail early if Supabase env is missing
+        run: |
+          if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ] || [ -z "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]; then
+            echo "::error::NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY が未設定です。GitHub Secrets を設定してください。"
+            exit 1
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -34,7 +51,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build static site
+      - name: Build static site (Supabase から無料公開情報のみ取得)
         run: npm run build
 
       - name: Upload artifact
@@ -52,3 +69,31 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # 公開反映ジョブのステータスを rebuild_jobs に書き戻す（任意・Secrets 設定時のみ動作）。
+  # service_role key は GitHub Secrets のみ。ブラウザには一切出ない。
+  update-job-status:
+    needs: [build, deploy]
+    if: ${{ always() && github.event_name == 'workflow_dispatch' && github.event.inputs.job_id != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update rebuild_jobs (success / failed)
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          JOB_ID: ${{ github.event.inputs.job_id }}
+          RUN_ID: ${{ github.run_id }}
+          DEPLOY_RESULT: ${{ needs.deploy.result }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SERVICE_KEY" ]; then
+            echo "Supabase service role 未設定のため rebuild_jobs 更新をスキップ。"
+            exit 0
+          fi
+          if [ "$DEPLOY_RESULT" = "success" ]; then STATUS="succeeded"; else STATUS="failed"; fi
+          curl -fsS -X PATCH \
+            "$SUPABASE_URL/rest/v1/rebuild_jobs?id=eq.$JOB_ID" \
+            -H "apikey: $SERVICE_KEY" \
+            -H "Authorization: Bearer $SERVICE_KEY" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: return=minimal" \
+            -d "{\"status\":\"$STATUS\",\"github_run_id\":\"$RUN_ID\"}"

@@ -1,29 +1,70 @@
 @import "tailwindcss";
 
+/*
+  メンズエステ体験レビューサイト デザイントークン
+  方針: 黒・ベージュ・ゴールド基調。高級感・夜・秘密・本音レビュー。
+  出典: docs/specs/mens-esthe-review_design-spec.md §3, §14
+  Tailwind v4 は @theme でトークン定義（tailwind.config.ts は使わない）
+*/
+
+@theme {
+  /* --- 背景・サーフェス（夜系） --- */
+  --color-night-950: #0d0b0a;
+  --color-night-900: #181311;
+  --color-night-850: #241b18;
+  --color-night-800: #3a2c26;
+
+  /* --- プライマリ（シャンパンゴールド） --- */
+  --color-champagne-300: #e0b98b;
+  --color-champagne-400: #d2a679;
+  --color-champagne-500: #a9784e;
+
+  /* --- アクセント --- */
+  --color-wine-700: #8f1d2c;
+  --color-orchid-600: #5d3a78;
+
+  /* --- テキスト（温かいアイボリー系） --- */
+  --color-ivory-100: #f4e9de;
+  --color-ivory-300: #b8a79b;
+  --color-ivory-500: #7e6f66;
+
+  /* --- 機能色 --- */
+  --color-lock: #d6a84f;
+  --color-error: #d95c5c;
+  --color-success: #6faf7a;
+
+  /* --- フォント --- */
+  --font-sans: var(--font-noto-sans-jp), "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+
+  /* --- 角丸（design-spec §9.1） --- */
+  --radius-card: 1.5rem;
+  --radius-input: 1rem;
+  --radius-pill: 999px;
+
+  /* --- シャドウ（design-spec §9.2, §14） --- */
+  --shadow-glow: 0 0 40px rgba(210, 166, 121, 0.18);
+  --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.35);
+
+  /* --- コンテナ最大幅（design-spec §5.2） --- */
+  --container-sm: 640px;
+  --container-md: 960px;
+  --container-lg: 1120px;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  background-color: var(--color-night-950);
+  color: var(--color-ivory-100);
+  font-family: var(--font-sans);
   line-height: 1.8;
-  font-size: 1rem;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 暗背景でもフォーカスリングを消さない（design-spec §12 アクセシビリティ） */
+:focus-visible {
+  outline: 2px solid var(--color-champagne-400);
+  outline-offset: 2px;
 }

@@ -1,22 +1,24 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const notoSansJP = Noto_Sans_JP({
+  variable: "--font-noto-sans-jp",
   subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jiisan-estet.com";
 
 export const metadata: Metadata = {
-  title: "Men's Blogsite",
+  title: {
+    default: "夜に、外さないための本音レビュー",
+    template: "%s | メンズエステ本音レビュー",
+  },
   description:
-    "男性向け体験談を丁寧に届けるためのNext.jsブログプラットフォームのプロトタイプです。",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.com"),
+    "料金、雰囲気、清潔感、写真とのギャップまで。行く前に知りたいメンズエステの本音を記録するレビューサイト。",
+  metadataBase: new URL(siteUrl),
 };
 
 export default function RootLayout({
@@ -26,11 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+      <body className={`${notoSansJP.variable} antialiased`}>{children}</body>
     </html>
   );
 }

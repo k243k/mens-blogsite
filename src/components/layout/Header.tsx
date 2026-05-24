@@ -1,0 +1,48 @@
+import Link from "next/link";
+
+import { AuthNav } from "@/components/auth/AuthNav";
+
+/**
+ * 共通ヘッダー。
+ * 出典: design-spec §7.1。半透明の黒・スクロールでblur・下線は薄いブラウン。
+ */
+const NAV = [
+  { href: "/reviews", label: "最新レビュー" },
+  { href: "/ranking", label: "ランキング" },
+  { href: "/#areas", label: "エリアから探す" },
+];
+
+export function Header() {
+  return (
+    <header className="sticky top-0 z-50 border-b border-champagne-400/15 bg-night-950/80 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-[var(--container-lg)] items-center justify-between px-5 py-4">
+        <Link href="/" className="flex items-center gap-2">
+          <span className="text-lg font-bold tracking-tight text-ivory-100">
+            夜<span className="text-champagne-400">レビュー</span>
+          </span>
+        </Link>
+
+        <nav className="hidden items-center gap-6 md:flex">
+          {NAV.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="text-sm text-ivory-300 transition hover:text-ivory-100"
+            >
+              {item.label}
+            </Link>
+          ))}
+          <AuthNav />
+        </nav>
+
+        {/* モバイル: 簡易メニュー（Phase 4 で開閉実装） */}
+        <Link
+          href="/reviews"
+          className="rounded-full border border-champagne-400/40 px-4 py-2 text-sm font-bold text-ivory-100 md:hidden"
+        >
+          メニュー
+        </Link>
+      </div>
+    </header>
+  );
+}
