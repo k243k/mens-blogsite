@@ -22,6 +22,7 @@ const READABLE = [
 type PaidLockBoxProps = {
   mode?: "guest" | "locked";
   loginHref?: string;
+  signupHref?: string;
   unitPrice?: number | null;
   onPurchase?: () => void;
   purchasing?: boolean;
@@ -30,6 +31,7 @@ type PaidLockBoxProps = {
 export function PaidLockBox({
   mode = "locked",
   loginHref = "/login",
+  signupHref = "/login?mode=signup",
   unitPrice = null,
   onPurchase,
   purchasing = false,
@@ -71,7 +73,10 @@ export function PaidLockBox({
 
         <div className="mt-7 flex flex-wrap items-center gap-3">
           {mode === "guest" ? (
-            <Button variant="primary" href={loginHref}>ログインして本音を読む</Button>
+            <>
+              <Button variant="primary" href={signupHref}>無料登録して本音を読む</Button>
+              <Button variant="secondary" href={loginHref}>ログイン</Button>
+            </>
           ) : (
             <Button variant="primary" onClick={onPurchase}>
               {purchasing
@@ -84,7 +89,7 @@ export function PaidLockBox({
         </div>
         <p className="mt-3 text-xs text-ivory-500">
           {mode === "guest"
-            ? "※ 購入済みの方はログインすると本文が表示されます。"
+            ? "※ 登録は無料です。本音レビューは記事ごとの単品購入制。購入済みの方はログインすると本文が表示されます。"
             : "※ 単品購入後、この記事の本音レビューがいつでも読めます。"}
         </p>
       </div>

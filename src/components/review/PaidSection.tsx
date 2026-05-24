@@ -75,10 +75,11 @@ export function PaidSection({ reviewId, unitPrice = null }: { reviewId: string; 
 
   // 未ログイン
   if (!user) {
-    const loginHref = `/login?redirect=${encodeURIComponent(
-      typeof window !== "undefined" ? window.location.pathname : "/",
-    )}`;
-    return <PaidLockBox mode="guest" loginHref={loginHref} unitPrice={unitPrice} />;
+    const redirectPath = typeof window !== "undefined" ? window.location.pathname : "/";
+    const enc = encodeURIComponent(redirectPath);
+    const loginHref = `/login?redirect=${enc}`;
+    const signupHref = `/login?mode=signup&redirect=${enc}`;
+    return <PaidLockBox mode="guest" loginHref={loginHref} signupHref={signupHref} unitPrice={unitPrice} />;
   }
 
   // RPC 判定中

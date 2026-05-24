@@ -34,6 +34,10 @@ export function getBrowserSupabase(): SupabaseClient {
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
+      // メール確認・パスワード再設定リンクはトークンを URL ハッシュ（#access_token=...）に
+      // 載せて返す（implicit）。flowType を明示しないと既定の PKCE 解釈になり、ハッシュを
+      // 処理できず確認/再設定の自動ログインが成立しない。implicit を明示して両フローを通す。
+      flowType: "implicit",
     },
   });
 
