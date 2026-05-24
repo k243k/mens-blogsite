@@ -54,6 +54,12 @@ insert into reviews (id, shop_id, area_id, author_id, title, slug, free_body, is
 insert into reviews (id, shop_id, area_id, author_id, title, slug, free_body, is_paid, status, published_at) values
   ('33333333-3333-3333-3333-333333333333','bbbb0000-0000-0000-0000-000000000001','aaaa0000-0000-0000-0000-000000000001','00000000-0000-0000-0000-0000000000a1','admin著の公開記事','admin-owned','admin著の無料本文。', false, 'published', now());
 
+-- ④author_id NULL の公開・有料記事（NULL安全バグの回帰防止用）
+insert into reviews (id, shop_id, area_id, author_id, title, slug, free_body, is_paid, unit_price, status, published_at) values
+  ('44444444-4444-4444-4444-444444444444','bbbb0000-0000-0000-0000-000000000001','aaaa0000-0000-0000-0000-000000000001',null,'著者なし公開有料記事','null-author-paid','無料本文。', true, 500, 'published', now());
+insert into review_scores (review_id, overall_score) values ('44444444-4444-4444-4444-444444444444',4.0);
+insert into review_paid_contents (review_id, body) values ('44444444-4444-4444-4444-444444444444','著者NULL記事の有料本文（未購入には絶対見せない）。');
+
 -- --- スコア ---
 insert into review_scores (review_id, overall_score, sensual_score, cleanliness_score, revisit_score) values
   ('11111111-1111-1111-1111-111111111111',4.6,4.8,4.4,4.7),

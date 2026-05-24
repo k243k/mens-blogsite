@@ -133,9 +133,9 @@ begin;
   do $$
   declare c int;
   begin
-    -- seed の published 記事は 1111(writer著) と 3333(admin著) の2件（2222はdraftで除外）
+    -- seed の published 記事は 1111(writer) / 3333(admin) / 44444444(著者NULL) の3件（2222はdraft除外）
     select count(*) into c from public_reviews_for_build;
-    if c <> 2 then raise exception 'FAIL case9: ビルドviewの公開記事数が想定外 (件数=%)', c; end if;
+    if c <> 3 then raise exception 'FAIL case9: ビルドviewの公開記事数が想定外 (件数=%)', c; end if;
     -- 有料カラムが存在しないこと（情報スキーマで確認）
     if exists (
       select 1 from information_schema.columns
@@ -145,6 +145,26 @@ begin;
       raise exception 'FAIL case9: ビルドviewに有料カラムが含まれる';
     end if;
     raise notice 'PASS case9: ビルドviewは公開1件・有料カラム無し';
+  end $$;
+rollback;
+
+\echo '--- Case 10(回帰): author_id NULL の公開有料記事を未購入userが読めない（NULL安全） ---'
+begin;
+  set local role authenticated;
+  set local "request.jwt.claims" = '{"sub":"00000000-0000-0000-0000-0000000000c1","role":"authenticated"}';
+  do $$
+  declare c int;
+  begin
+    -- 直接テーブル（RLS）
+    select count(*) into c from review_paid_contents where review_id = '44444444-4444-4444-4444-444444444444';
+    if c <> 0 then raise exception 'FAIL case10: 未購入userがNULL著者記事の有料本文をテーブル取得'; end if;
+    -- RPC（旧バグの本丸）
+    begin
+      select count(*) into c from get_review_paid_content('44444444-4444-4444-4444-444444444444');
+      raise exception 'FAIL case10: 未購入userがNULL著者記事をRPCで取得（NULL安全バグ再発）';
+    exception when insufficient_privilege then
+      raise notice 'PASS case10: NULL著者の公開有料記事も未購入userは取得不可';
+    end;
   end $$;
 rollback;
 
