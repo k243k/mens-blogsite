@@ -57,7 +57,8 @@ Deno.serve(async (req) => {
     .select("role")
     .eq("id", userId)
     .single();
-  if (!profile || !["writer", "editor", "admin"].includes(profile.role)) {
+  // 公開反映（再ビルド起動）は editor/admin のみ。writer は記事作成・下書きまで。
+  if (!profile || !["editor", "admin"].includes(profile.role)) {
     return json({ status: "forbidden" }, 403);
   }
 
