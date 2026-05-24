@@ -67,6 +67,8 @@ export type Review = {
   freeBody: string;
   scores: ReviewScores;
   isPaid: boolean;
+  /** 単品販売価格（円）。有料記事の購入価格。null は未設定。 */
+  unitPrice: number | null;
   isPr: boolean;
   thumbnailUrl: string | null;
   mainImageUrl: string | null;

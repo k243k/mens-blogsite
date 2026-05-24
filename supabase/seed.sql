@@ -46,9 +46,9 @@ insert into shops (id, area_id, name, slug, station, price_min, price_max, statu
   ('bbbb0000-0000-0000-0000-000000000001','aaaa0000-0000-0000-0000-000000000001','Lumiere 梅田','lumiere-umeda','梅田駅 徒歩5分',12000,22000,'published');
 
 -- --- レビュー（①公開・有料 ②下書き・有料／writer著） ---
-insert into reviews (id, shop_id, area_id, author_id, title, slug, free_body, is_paid, status, published_at) values
-  ('11111111-1111-1111-1111-111111111111','bbbb0000-0000-0000-0000-000000000001','aaaa0000-0000-0000-0000-000000000001','00000000-0000-0000-0000-0000000000d1','梅田の隠れ家スパ（公開）','published-paid','無料本文です。', true, 'published', now()),
-  ('22222222-2222-2222-2222-222222222222','bbbb0000-0000-0000-0000-000000000001','aaaa0000-0000-0000-0000-000000000001','00000000-0000-0000-0000-0000000000d1','下書きレビュー','draft-paid','下書きの無料本文。', true, 'draft', null);
+insert into reviews (id, shop_id, area_id, author_id, title, slug, free_body, is_paid, unit_price, status, published_at) values
+  ('11111111-1111-1111-1111-111111111111','bbbb0000-0000-0000-0000-000000000001','aaaa0000-0000-0000-0000-000000000001','00000000-0000-0000-0000-0000000000d1','梅田の隠れ家スパ（公開）','published-paid','無料本文です。', true, 500, 'published', now()),
+  ('22222222-2222-2222-2222-222222222222','bbbb0000-0000-0000-0000-000000000001','aaaa0000-0000-0000-0000-000000000001','00000000-0000-0000-0000-0000000000d1','下書きレビュー','draft-paid','下書きの無料本文。', true, 300, 'draft', null);
 
 -- ③admin著の公開記事（writer が他人の記事を編集できないことの検証用）
 insert into reviews (id, shop_id, area_id, author_id, title, slug, free_body, is_paid, status, published_at) values

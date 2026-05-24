@@ -135,7 +135,7 @@ export default async function ReviewDetailPage({
 
         {review.isPaid && (
           <section className="mt-10">
-            <PaidSection reviewId={review.id} />
+            <PaidSection reviewId={review.id} unitPrice={review.unitPrice} />
           </section>
         )}
 

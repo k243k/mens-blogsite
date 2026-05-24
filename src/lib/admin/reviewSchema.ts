@@ -46,6 +46,7 @@ export const reviewFormSchema = z.object({
 
   // 有料本文（review_paid_contents へ）
   isPaid: z.boolean(),
+  unitPrice: z.number().int().min(50).nullable(),
   paidBody: z.string().optional().nullable(),
   photoGap: z.string().optional().nullable(),
   satisfaction: z.string().optional().nullable(),
@@ -55,6 +56,9 @@ export const reviewFormSchema = z.object({
 }).refine(
   (v) => !v.isPaid || (v.paidBody !== null && v.paidBody !== undefined && v.paidBody.trim().length > 0),
   { message: "有料記事には有料本文が必須です", path: ["paidBody"] },
+).refine(
+  (v) => !v.isPaid || (v.unitPrice !== null && v.unitPrice >= 50),
+  { message: "有料記事には販売価格が必須です", path: ["unitPrice"] },
 );
 
 export type ReviewFormValues = z.infer<typeof reviewFormSchema>;
@@ -84,6 +88,7 @@ export const emptyReviewForm: ReviewFormValues = {
   cost: null,
   revisit: null,
   isPaid: false,
+  unitPrice: null,
   paidBody: "",
   photoGap: "",
   satisfaction: "",

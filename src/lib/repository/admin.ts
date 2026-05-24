@@ -59,7 +59,7 @@ export async function getReviewForEdit(id: string): Promise<ReviewFormValues | n
   const { data: r, error } = await supabase
     .from("reviews")
     .select(
-      "id,shop_id,area_id,title,slug,visit_date,price,course_minutes,summary,free_body,is_paid,is_pr,status,thumbnail_url,main_image_url",
+      "id,shop_id,area_id,title,slug,visit_date,price,course_minutes,summary,free_body,is_paid,is_pr,unit_price,status,thumbnail_url,main_image_url",
     )
     .eq("id", id)
     .maybeSingle();
@@ -103,6 +103,7 @@ export async function getReviewForEdit(id: string): Promise<ReviewFormValues | n
     cost: sc?.cost_score ?? null,
     revisit: sc?.revisit_score ?? null,
     isPaid: r.is_paid,
+    unitPrice: r.unit_price ?? null,
     paidBody: paid?.body ?? "",
     photoGap: paid?.photo_gap ?? "",
     satisfaction: paid?.satisfaction ?? "",
@@ -125,6 +126,7 @@ function reviewRow(v: ReviewFormValues, authorId: string) {
     summary: v.summary || null,
     free_body: v.freeBody,
     is_paid: v.isPaid,
+    unit_price: v.isPaid ? v.unitPrice : null,
     is_pr: v.isPr,
     status: v.status,
     thumbnail_url: v.thumbnailUrl || null,

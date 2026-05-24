@@ -156,6 +156,18 @@ export function ReviewForm({ defaultValues, onSubmit, submitting, serverError }:
 
         {isPaid && (
           <div className="mt-4 space-y-4 rounded-[var(--radius-input)] border border-champagne-400/20 bg-night-900 p-4">
+            <Field label="単品販売価格（円）" error={errors.unitPrice?.message}>
+              <select
+                {...register("unitPrice", { setValueAs: numberSetAs })}
+                className={inputCls}
+              >
+                <option value="">選択してください</option>
+                <option value="300">300円</option>
+                <option value="500">500円</option>
+                <option value="800">800円</option>
+                <option value="1000">1,000円</option>
+              </select>
+            </Field>
             <Field label="有料本文（Markdown可）" error={errors.paidBody?.message}>
               <textarea {...register("paidBody")} rows={8} className={inputCls} />
             </Field>

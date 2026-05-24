@@ -410,3 +410,10 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 [functions.trigger-rebuild]
 # ログイン済みJWT必須（Function内でさらにrole確認）。
 verify_jwt = true
+
+[functions.create-checkout-session]
+verify_jwt = true
+
+[functions.stripe-webhook]
+# Stripe からの呼び出しは JWT を持たない。署名検証で担保するため JWT 検証は無効。
+verify_jwt = false

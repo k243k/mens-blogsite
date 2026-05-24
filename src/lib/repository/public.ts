@@ -19,6 +19,7 @@ type BuildRow = {
   free_body: string;
   is_paid: boolean;
   is_pr: boolean;
+  unit_price: number | null;
   thumbnail_url: string | null;
   main_image_url: string | null;
   meta_title: string | null;
@@ -67,6 +68,7 @@ function toReview(r: BuildRow): Review {
     },
     isPaid: r.is_paid,
     isPr: r.is_pr,
+    unitPrice: r.unit_price,
     thumbnailUrl: r.thumbnail_url,
     mainImageUrl: r.main_image_url,
     publishedAt: r.published_at,
@@ -74,7 +76,7 @@ function toReview(r: BuildRow): Review {
 }
 
 const REVIEW_COLUMNS =
-  "id,slug,title,visit_date,price,course_minutes,summary,free_body,is_paid,is_pr,thumbnail_url,main_image_url,meta_title,meta_description,noindex,published_at,shop_slug,shop_name,area_slug,area_name,overall_score,sensual_score,cleanliness_score,service_score,distance_score,photo_accuracy_score,beginner_score,cost_score,revisit_score";
+  "id,slug,title,visit_date,price,course_minutes,summary,free_body,is_paid,is_pr,unit_price,thumbnail_url,main_image_url,meta_title,meta_description,noindex,published_at,shop_slug,shop_name,area_slug,area_name,overall_score,sensual_score,cleanliness_score,service_score,distance_score,photo_accuracy_score,beginner_score,cost_score,revisit_score";
 
 /** 公開レビュー全件（新着順）。 */
 export async function getAllPublishedReviews(): Promise<Review[]> {

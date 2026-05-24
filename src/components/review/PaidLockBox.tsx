@@ -22,9 +22,18 @@ const READABLE = [
 type PaidLockBoxProps = {
   mode?: "guest" | "locked";
   loginHref?: string;
+  unitPrice?: number | null;
+  onPurchase?: () => void;
+  purchasing?: boolean;
 };
 
-export function PaidLockBox({ mode = "locked", loginHref = "/login" }: PaidLockBoxProps) {
+export function PaidLockBox({
+  mode = "locked",
+  loginHref = "/login",
+  unitPrice = null,
+  onPurchase,
+  purchasing = false,
+}: PaidLockBoxProps) {
   return (
     <section
       className="relative overflow-hidden rounded-[var(--radius-card)] border border-champagne-400/25 p-8"
@@ -60,17 +69,23 @@ export function PaidLockBox({ mode = "locked", loginHref = "/login" }: PaidLockB
           ))}
         </ul>
 
-        <div className="mt-7 flex flex-wrap gap-3">
+        <div className="mt-7 flex flex-wrap items-center gap-3">
           {mode === "guest" ? (
             <Button variant="primary" href={loginHref}>ログインして本音を読む</Button>
           ) : (
-            <Button variant="primary">この店の本音を確認する</Button>
+            <Button variant="primary" onClick={onPurchase}>
+              {purchasing
+                ? "決済ページへ移動中…"
+                : unitPrice
+                  ? `この店の本音を確認する（¥${unitPrice.toLocaleString()}）`
+                  : "この店の本音を確認する"}
+            </Button>
           )}
         </div>
         <p className="mt-3 text-xs text-ivory-500">
           {mode === "guest"
             ? "※ 購入済みの方はログインすると本文が表示されます。"
-            : "※ 決済は準備中です（Phase 7 で Stripe 接続予定）。"}
+            : "※ 単品購入後、この記事の本音レビューがいつでも読めます。"}
         </p>
       </div>
     </section>
