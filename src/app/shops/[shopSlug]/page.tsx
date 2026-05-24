@@ -14,6 +14,8 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jiisan-estet.com";
  * 店舗詳細ページ。店舗情報＋紐づくレビュー一覧。
  * 出典: design-spec §8.4 / requirements §5.5。無料公開情報のみ。
  */
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   const shops = await getAllShops();
   return shops.map((s) => ({ shopSlug: s.slug }));

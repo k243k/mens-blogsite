@@ -23,6 +23,9 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jiisan-estet.com";
  * ⚠️ 有料本文はこのページに含めない（PaidLockBox は文言とCTAのみ）。
  *    実本文取得は Phase 4（CSR + RPC get_review_paid_content）。
  */
+// 公開記事が0件でも output: export を成立させる（事前生成したparamsのみ有効）。
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   const reviews = await getAllPublishedReviews();
   return reviews.map((r) => ({ slug: r.slug }));

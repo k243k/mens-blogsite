@@ -13,6 +13,8 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jiisan-estet.com";
  * 地域別レビュー一覧ページ。
  * 出典: design-spec §8 / requirements §5.4。無料公開情報のみ。
  */
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   const areas = await getAllAreas();
   return areas.map((a) => ({ areaSlug: a.slug }));
