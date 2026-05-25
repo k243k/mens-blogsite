@@ -20,7 +20,7 @@ export function Header() {
       <div className="mx-auto flex max-w-[var(--container-lg)] items-center justify-between px-5 py-4">
         <Link href="/" className="flex items-center" aria-label="外さない夜 トップへ">
           <Image
-            src="/logo-yoru.png"
+            src="/logo-yoru-2.png"
             alt="外さない夜"
             width={430}
             height={200}
