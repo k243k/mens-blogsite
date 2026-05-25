@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { HeroSlideshow } from "@/components/layout/HeroSlideshow";
 import { ReviewCard } from "@/components/review/ReviewCard";
 import { Button } from "@/components/ui/Button";
 import { getAllAreas, getAllPublishedReviews } from "@/lib/repository/public";
@@ -22,17 +22,8 @@ export default async function HomePage() {
       <Header />
 
       <section className="grain relative isolate overflow-hidden">
-        {/* 背景サンプル画像（差し替え前提）。ゆっくりパンしながら奥行きを出す */}
-        <div aria-hidden="true" className="absolute inset-0 -z-10">
-          <Image
-            src="/samples/hero-2.jpg"
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="ken-burns object-cover object-center opacity-70"
-          />
-        </div>
+        {/* 背景：2〜3枚をクロスフェードで切り替えるスライドショー（差し替え前提） */}
+        <HeroSlideshow />
         {/* 多層オーバーレイ。テキスト側(左)は暗く、右は画像を見せる横スクリム＋ゴールド/ワインの光 */}
         <div
           aria-hidden="true"
