@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { AuthNav } from "@/components/auth/AuthNav";
+import { StaffAdminLink } from "@/components/layout/StaffAdminLink";
 
 /**
  * 共通ヘッダー。
@@ -22,26 +23,31 @@ export function Header() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex">
-          {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-sm text-ivory-300 transition hover:text-ivory-100"
-            >
-              {item.label}
-            </Link>
-          ))}
-          <AuthNav />
-        </nav>
+        <div className="flex items-center gap-3">
+          {/* staff でログイン中なら PC・スマホ問わず管理画面へ入れる導線を出す */}
+          <StaffAdminLink />
 
-        {/* モバイル: 簡易メニュー（Phase 4 で開閉実装） */}
-        <Link
-          href="/reviews"
-          className="rounded-full border border-champagne-400/40 px-4 py-2 text-sm font-bold text-ivory-100 md:hidden"
-        >
-          メニュー
-        </Link>
+          <nav className="hidden items-center gap-6 md:flex">
+            {NAV.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="text-sm text-ivory-300 transition hover:text-ivory-100"
+              >
+                {item.label}
+              </Link>
+            ))}
+            <AuthNav />
+          </nav>
+
+          {/* モバイル: 簡易メニュー（Phase 4 で開閉実装） */}
+          <Link
+            href="/reviews"
+            className="rounded-full border border-champagne-400/40 px-4 py-2 text-sm font-bold text-ivory-100 md:hidden"
+          >
+            メニュー
+          </Link>
+        </div>
       </div>
     </header>
   );
