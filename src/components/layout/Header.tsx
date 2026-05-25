@@ -22,10 +22,10 @@ export function Header() {
           <Image
             src="/logo.png"
             alt="外さない夜"
-            width={64}
-            height={48}
+            width={430}
+            height={200}
             priority
-            className="h-10 w-auto sm:h-12"
+            className="h-12 w-auto sm:h-14"
           />
         </Link>
 
