@@ -25,21 +25,21 @@ export default async function HomePage() {
         {/* 背景サンプル画像（差し替え前提）。ゆっくりパンしながら奥行きを出す */}
         <div aria-hidden="true" className="absolute inset-0 -z-10">
           <Image
-            src="/samples/hero.jpg"
+            src="/samples/hero-2.jpg"
             alt=""
             fill
             priority
             sizes="100vw"
-            className="slow-pan object-cover opacity-40"
+            className="slow-pan object-cover opacity-70"
           />
         </div>
-        {/* 多層オーバーレイ（ゴールド／ワインの光＋下方向の暗がりで可読性確保） */}
+        {/* 多層オーバーレイ。テキスト側(左)は暗く、右は画像を見せる横スクリム＋ゴールド/ワインの光 */}
         <div
           aria-hidden="true"
           className="absolute inset-0 -z-10"
           style={{
             background:
-              "radial-gradient(circle at 18% 22%, rgba(210,166,121,0.20), transparent 40%), radial-gradient(circle at 86% 18%, rgba(143,29,44,0.22), transparent 38%), linear-gradient(180deg, rgba(13,11,10,0.55) 0%, rgba(13,11,10,0.82) 58%, #0d0b0a 100%)",
+              "radial-gradient(circle at 16% 24%, rgba(210,166,121,0.26), transparent 42%), radial-gradient(circle at 88% 72%, rgba(143,29,44,0.22), transparent 46%), linear-gradient(90deg, rgba(13,11,10,0.94) 0%, rgba(13,11,10,0.66) 42%, rgba(13,11,10,0.30) 100%), linear-gradient(180deg, transparent 48%, rgba(13,11,10,0.88) 100%)",
           }}
         />
         {/* 息づくゴールドの光 */}

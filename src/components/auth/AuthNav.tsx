@@ -19,7 +19,7 @@ export function AuthNav() {
     return (
       <Link
         href="/login"
-        className="rounded-full border border-champagne-400/40 px-4 py-2 text-sm font-bold text-ivory-100 transition hover:bg-champagne-400/10"
+        className="rounded-full border border-champagne-400/40 px-5 py-2 text-[13px] font-bold tracking-[0.08em] text-ivory-100 transition hover:border-champagne-400/70 hover:bg-champagne-400/10"
       >
         ログイン
       </Link>
@@ -28,13 +28,13 @@ export function AuthNav() {
 
   return (
     <div className="flex items-center gap-3">
-      <span className="hidden text-xs text-ivory-300 sm:inline">{user.email}</span>
+      <span className="hidden text-xs tracking-wide text-ivory-500 sm:inline">{user.email}</span>
       <button
         type="button"
         onClick={() => {
           void signOut().then(() => window.location.assign("/"));
         }}
-        className="rounded-full border border-champagne-400/40 px-4 py-2 text-sm font-bold text-ivory-100 transition hover:bg-champagne-400/10"
+        className="rounded-full border border-champagne-400/40 px-5 py-2 text-[13px] font-bold tracking-[0.08em] text-ivory-100 transition hover:border-champagne-400/70 hover:bg-champagne-400/10"
       >
         ログアウト
       </button>

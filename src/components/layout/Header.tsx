@@ -33,14 +33,15 @@ export function Header() {
           {/* staff でログイン中なら PC・スマホ問わず管理画面へ入れる導線を出す */}
           <StaffAdminLink />
 
-          <nav className="hidden items-center gap-6 md:flex">
+          <nav className="hidden items-center gap-7 md:flex">
             {NAV.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-sm text-ivory-300 transition hover:text-ivory-100"
+                className="group relative py-1 text-[13px] font-medium tracking-[0.08em] text-ivory-300 transition hover:text-champagne-300"
               >
                 {item.label}
+                <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-champagne-400 transition-all duration-300 group-hover:w-full" />
               </Link>
             ))}
             <AuthNav />
