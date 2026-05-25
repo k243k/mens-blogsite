@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { AuthNav } from "@/components/auth/AuthNav";
@@ -17,10 +18,15 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-champagne-400/15 bg-night-950/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-[var(--container-lg)] items-center justify-between px-5 py-4">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-lg font-bold tracking-tight text-ivory-100">
-            夜<span className="text-champagne-400">レビュー</span>
-          </span>
+        <Link href="/" className="flex items-center" aria-label="外さない夜 トップへ">
+          <Image
+            src="/logo.png"
+            alt="外さない夜"
+            width={64}
+            height={48}
+            priority
+            className="h-10 w-auto sm:h-12"
+          />
         </Link>
 
         <div className="flex items-center gap-3">
