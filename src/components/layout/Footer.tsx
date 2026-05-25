@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 /**
@@ -14,10 +15,8 @@ export function Footer() {
   return (
     <footer className="mt-24 border-t border-champagne-400/15 bg-night-900">
       <div className="mx-auto max-w-[var(--container-lg)] px-5 py-12">
-        <p className="text-lg font-bold text-ivory-100">
-          夜<span className="text-champagne-400">レビュー</span>
-        </p>
-        <p className="mt-2 max-w-md text-sm leading-7 text-ivory-500">
+        <Image src="/logo-yoru-2.png" alt="外さない夜" width={430} height={200} className="h-11 w-auto" />
+        <p className="mt-4 max-w-md text-sm leading-7 text-ivory-500">
           メンズエステの店舗選びに役立つ体験レビュー。料金・雰囲気・清潔感・接客・写真とのギャップを記録します。
         </p>
 
@@ -34,7 +33,7 @@ export function Footer() {
         </nav>
 
         <p className="mt-8 text-xs text-ivory-500">
-          © {new Date().getFullYear()} 夜レビュー
+          © {new Date().getFullYear()} 外さない夜
         </p>
       </div>
     </footer>

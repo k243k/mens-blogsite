@@ -28,6 +28,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
+      <head>
+        {/* 見出し・ブランド用の明朝ディスプレイ。日本語グリフ込みで全デバイスに明朝を保証。
+            Google が unicode-range で分割配信するため実使用文字分のみDLされる。 */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@700;800&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className={`${notoSansJP.variable} antialiased`}>{children}</body>
     </html>
   );

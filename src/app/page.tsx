@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { Footer } from "@/components/layout/Footer";
@@ -20,30 +21,49 @@ export default async function HomePage() {
     <>
       <Header />
 
-      <section className="relative overflow-hidden">
+      <section className="grain relative isolate overflow-hidden">
+        {/* 背景サンプル画像（差し替え前提）。ゆっくりパンしながら奥行きを出す */}
+        <div aria-hidden="true" className="absolute inset-0 -z-10">
+          <Image
+            src="/samples/hero.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="slow-pan object-cover opacity-40"
+          />
+        </div>
+        {/* 多層オーバーレイ（ゴールド／ワインの光＋下方向の暗がりで可読性確保） */}
         <div
           aria-hidden="true"
-          className="absolute inset-0"
+          className="absolute inset-0 -z-10"
           style={{
             background:
-              "radial-gradient(circle at 20% 20%, rgba(210,166,121,0.22), transparent 35%), radial-gradient(circle at 80% 30%, rgba(143,29,44,0.22), transparent 30%), linear-gradient(135deg, #0D0B0A, #181311 55%, #0D0B0A)",
+              "radial-gradient(circle at 18% 22%, rgba(210,166,121,0.20), transparent 40%), radial-gradient(circle at 86% 18%, rgba(143,29,44,0.22), transparent 38%), linear-gradient(180deg, rgba(13,11,10,0.55) 0%, rgba(13,11,10,0.82) 58%, #0d0b0a 100%)",
           }}
         />
-        <div className="relative mx-auto max-w-[var(--container-lg)] px-5 py-24 sm:py-32">
-          <p className="text-xs font-semibold tracking-[0.25em] text-champagne-400">
+        {/* 息づくゴールドの光 */}
+        <div
+          aria-hidden="true"
+          className="glow-breathe absolute -left-24 top-8 -z-10 h-80 w-80 rounded-full bg-champagne-400/20 blur-3xl"
+        />
+
+        <div className="relative mx-auto max-w-[var(--container-lg)] px-5 py-28 sm:py-44">
+          <p className="reveal delay-1 text-xs font-semibold tracking-[0.4em] text-champagne-400">
             MEN&apos;S ESTHE 本音レビュー
           </p>
-          <h1 className="mt-4 max-w-2xl text-4xl font-bold leading-tight text-ivory-100 sm:text-6xl">
-            今夜、外したくない
+          <div className="reveal delay-1 rule-gold mt-4 w-24" />
+          <h1 className="font-display reveal delay-2 mt-6 max-w-3xl text-[2.7rem] leading-[1.16] text-ivory-100 sm:text-7xl">
+            今夜、<span className="text-gold">外したくない</span>
             <br />
             メンズエステ体験談。
           </h1>
-          <p className="mt-5 max-w-xl text-sm leading-7 text-ivory-300 sm:text-base">
+          <p className="reveal delay-3 mt-6 max-w-xl text-sm leading-8 text-ivory-300 sm:text-base">
             料金、雰囲気、清潔感、写真とのギャップまで。
             <br />
-            行く前に知りたい本音を記録。
+            行く前に知りたい本音だけを、静かに記録する。
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="reveal delay-4 mt-9 flex flex-wrap gap-3">
             <Button href="#areas" variant="primary">エリアから探す</Button>
             <Button href="/reviews" variant="secondary">高評価レビューを見る</Button>
           </div>
@@ -51,9 +71,10 @@ export default async function HomePage() {
       </section>
 
       <div className="mx-auto max-w-[var(--container-lg)] px-5">
-        <section id="areas" className="scroll-mt-20 py-14">
-          <h2 className="text-2xl font-bold text-ivory-100">エリアから探す</h2>
-          <div className="mt-6 flex flex-wrap gap-3">
+        <section id="areas" className="scroll-mt-20 py-16">
+          <div className="rule-gold w-16" />
+          <h2 className="font-display mt-4 text-3xl text-ivory-100 sm:text-4xl">エリアから探す</h2>
+          <div className="mt-7 flex flex-wrap gap-3">
             {topAreas.map((area) => (
               <Link
                 key={area.slug}
@@ -66,10 +87,13 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="py-6">
+        <section className="py-8">
           <div className="flex items-end justify-between">
-            <h2 className="text-2xl font-bold text-ivory-100">最新レビュー</h2>
-            <Link href="/reviews" className="text-sm text-champagne-300 hover:text-champagne-400">
+            <div>
+              <div className="rule-gold w-16" />
+              <h2 className="font-display mt-4 text-3xl text-ivory-100 sm:text-4xl">最新レビュー</h2>
+            </div>
+            <Link href="/reviews" className="text-sm text-champagne-300 transition hover:text-champagne-400">
               すべて見る →
             </Link>
           </div>
@@ -84,16 +108,16 @@ export default async function HomePage() {
           )}
         </section>
 
-        <section className="py-14">
+        <section className="py-16">
           <div
-            className="overflow-hidden rounded-[var(--radius-card)] border border-champagne-400/25 p-10 text-center"
+            className="grain relative overflow-hidden rounded-[var(--radius-card)] border border-champagne-400/25 p-10 text-center shadow-card sm:p-14"
             style={{
               background:
                 "linear-gradient(135deg, rgba(13,11,10,0.95), rgba(143,29,44,0.3)), radial-gradient(circle at 30% 10%, rgba(210,166,121,0.2), transparent 40%)",
             }}
           >
-            <h2 className="text-2xl font-bold text-ivory-100 sm:text-3xl">行く前に、外さないために。</h2>
-            <p className="mx-auto mt-3 max-w-lg text-sm leading-7 text-ivory-300">
+            <h2 className="font-display text-3xl text-ivory-100 sm:text-4xl">行く前に、外さないために。</h2>
+            <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-ivory-300">
               写真とのギャップ、再訪判断、初心者が注意すべき点。本音レビューで今夜の判断材料を。
             </p>
             <div className="mt-7 flex justify-center">
