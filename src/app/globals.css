@@ -122,6 +122,22 @@ body {
   0% { transform: scale(1.08) translate(0, 0); }
   100% { transform: scale(1.16) translate(-2%, -2%); }
 }
+/* Ken Burns: ゆっくりズーム＋パンで写真に映画的な動きを出す */
+@keyframes ken-burns {
+  0% { transform: scale(1.06) translate(0, 0); }
+  100% { transform: scale(1.2) translate(-3%, -2.5%); }
+}
+/* 漂うゴールドの光の粒 */
+@keyframes float-orb {
+  0% { transform: translateY(0) translateX(0); opacity: 0.25; }
+  50% { transform: translateY(-30px) translateX(12px); opacity: 0.85; }
+  100% { transform: translateY(0) translateX(0); opacity: 0.25; }
+}
+/* 金箔の上を流れる光沢 */
+@keyframes sheen {
+  0% { background-position: 0% center; }
+  100% { background-position: 220% center; }
+}
 
 /* 登場アニメ（初期は不可視。delayでスタッガー） */
 .reveal {
@@ -135,9 +151,29 @@ body {
 
 .glow-breathe { animation: glow-breathe 7s ease-in-out infinite; }
 .slow-pan { animation: slow-pan 18s ease-in-out infinite alternate; }
+.ken-burns { animation: ken-burns 24s ease-in-out infinite alternate; }
+.float-orb { animation: float-orb 9s ease-in-out infinite; }
+
+/* 見出しの金箔を流れる光沢（動きのあるゴールド文字） */
+.shimmer-gold {
+  background: linear-gradient(
+    100deg,
+    #f0d9b0 0%,
+    #d2a679 28%,
+    #a9784e 46%,
+    #f6e6c2 58%,
+    #d2a679 74%,
+    #e8c48f 100%
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: sheen 7s linear infinite;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal, .glow-breathe, .slow-pan {
+  .reveal, .glow-breathe, .slow-pan, .ken-burns, .float-orb, .shimmer-gold {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;

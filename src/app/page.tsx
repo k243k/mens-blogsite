@@ -30,7 +30,7 @@ export default async function HomePage() {
             fill
             priority
             sizes="100vw"
-            className="slow-pan object-cover opacity-70"
+            className="ken-burns object-cover object-center opacity-70"
           />
         </div>
         {/* 多層オーバーレイ。テキスト側(左)は暗く、右は画像を見せる横スクリム＋ゴールド/ワインの光 */}
@@ -47,6 +47,26 @@ export default async function HomePage() {
           aria-hidden="true"
           className="glow-breathe absolute -left-24 top-8 -z-10 h-80 w-80 rounded-full bg-champagne-400/20 blur-3xl"
         />
+        {/* 漂うゴールドの光の粒（動き） */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+          <span className="float-orb absolute left-[18%] top-[28%] h-2 w-2 rounded-full bg-champagne-300/70 blur-[1px]" />
+          <span
+            className="float-orb absolute left-[64%] top-[52%] h-1.5 w-1.5 rounded-full bg-champagne-400/60 blur-[1px]"
+            style={{ animationDelay: "1.6s" }}
+          />
+          <span
+            className="float-orb absolute left-[42%] top-[68%] h-1 w-1 rounded-full bg-ivory-100/60"
+            style={{ animationDelay: "3.1s" }}
+          />
+          <span
+            className="float-orb absolute left-[80%] top-[34%] h-1.5 w-1.5 rounded-full bg-champagne-300/50 blur-[1px]"
+            style={{ animationDelay: "4.4s" }}
+          />
+          <span
+            className="float-orb absolute left-[30%] top-[44%] h-1 w-1 rounded-full bg-champagne-400/60"
+            style={{ animationDelay: "2.2s" }}
+          />
+        </div>
 
         <div className="relative mx-auto max-w-[var(--container-lg)] px-5 py-28 sm:py-44">
           <p className="reveal delay-1 text-xs font-semibold tracking-[0.4em] text-champagne-400">
@@ -54,7 +74,7 @@ export default async function HomePage() {
           </p>
           <div className="reveal delay-1 rule-gold mt-4 w-24" />
           <h1 className="font-display reveal delay-2 mt-6 max-w-3xl text-[2.7rem] leading-[1.16] text-ivory-100 sm:text-7xl">
-            今夜、<span className="text-gold">外したくない</span>
+            今夜、<span className="shimmer-gold">外したくない</span>
             <br />
             メンズエステ体験談。
           </h1>
