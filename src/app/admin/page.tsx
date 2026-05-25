@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { useProfile } from "@/lib/auth/useProfile";
+import { isEditorRole, useProfile } from "@/lib/auth/useProfile";
 
 /** 管理ダッシュボード（A002）。 */
 export default function AdminDashboard() {
@@ -30,6 +30,15 @@ export default function AdminDashboard() {
           <p className="text-lg font-bold text-ivory-100">記事を管理する</p>
           <p className="mt-1 text-sm text-ivory-300">下書き・公開記事の編集。</p>
         </Link>
+        {isEditorRole(role) && (
+          <Link
+            href="/admin/shops"
+            className="rounded-[var(--radius-card)] border border-champagne-400/15 bg-night-900 p-6 transition hover:border-champagne-400/35"
+          >
+            <p className="text-lg font-bold text-ivory-100">店舗を管理する</p>
+            <p className="mt-1 text-sm text-ivory-300">レビュー対象の店舗の追加・編集（editor/admin）。</p>
+          </Link>
+        )}
       </div>
     </main>
   );

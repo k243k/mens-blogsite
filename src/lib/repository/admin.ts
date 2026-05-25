@@ -7,6 +7,7 @@
  */
 import { getBrowserSupabase } from "@/lib/supabase/client";
 import type { ReviewFormValues } from "@/lib/admin/reviewSchema";
+import { shopFormSchema, type ShopFormValues } from "@/lib/admin/shopSchema";
 
 export type AdminReviewRow = {
   id: string;
@@ -51,6 +52,113 @@ export async function getShopOptions(): Promise<SelectOption[]> {
   const { data, error } = await getBrowserSupabase().from("shops").select("id,name").order("name");
   if (error) throw new Error(error.message);
   return (data ?? []).map((s) => ({ id: s.id, label: s.name }));
+}
+
+// ---------------------------------------------------------------------------
+// 店舗（shops）管理 CRUD。書き込みは RLS（is_editor = editor/admin）で保証。
+// ---------------------------------------------------------------------------
+
+export type AdminShopRow = {
+  id: string;
+  name: string;
+  slug: string;
+  status: string;
+  areaName: string | null;
+};
+
+/** 店舗一覧（管理用。エリア名を結合して表示）。 */
+export async function getEditableShops(): Promise<AdminShopRow[]> {
+  const { data, error } = await getBrowserSupabase()
+    .from("shops")
+    .select("id,name,slug,status,areas(name)")
+    .order("name");
+  if (error) throw new Error(error.message);
+  return (data ?? []).map((s) => {
+    // PostgREST の to-one 埋め込みはオブジェクト/配列いずれの形もありうる。
+    const area = s.areas as { name: string } | { name: string }[] | null;
+    const areaName = Array.isArray(area) ? (area[0]?.name ?? null) : (area?.name ?? null);
+    return { id: s.id, name: s.name, slug: s.slug, status: s.status, areaName };
+  });
+}
+
+/** 編集対象の店舗を読み込む。 */
+export async function getShopForEdit(id: string): Promise<ShopFormValues | null> {
+  const { data, error } = await getBrowserSupabase()
+    .from("shops")
+    .select(
+      "name,slug,area_id,station,price_min,price_max,business_hours,official_url,description,caution,status",
+    )
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!data) return null;
+  return {
+    name: data.name,
+    slug: data.slug,
+    areaId: data.area_id,
+    station: data.station ?? "",
+    priceMin: data.price_min,
+    priceMax: data.price_max,
+    businessHours: data.business_hours ?? "",
+    officialUrl: data.official_url ?? "",
+    description: data.description ?? "",
+    caution: data.caution ?? "",
+    status: data.status === "private" ? "private" : "published",
+  };
+}
+
+function shopRow(v: ShopFormValues) {
+  // mutation 境界でも再バリデーション（クライアント関数は DevTools から直接呼べるため）。
+  shopFormSchema.parse(v);
+  return {
+    name: v.name,
+    slug: v.slug,
+    area_id: v.areaId,
+    station: v.station || null,
+    price_min: v.priceMin,
+    price_max: v.priceMax,
+    business_hours: v.businessHours || null,
+    official_url: v.officialUrl || null,
+    description: v.description || null,
+    caution: v.caution || null,
+    status: v.status,
+  };
+}
+
+/** shops の保存系エラーを利用者向け文言に変換する。 */
+function shopWriteError(message: string): Error {
+  if (/duplicate key|unique|23505/i.test(message)) {
+    return new Error("この slug は既に使われています。別の slug にしてください。");
+  }
+  return new Error(message);
+}
+
+/** 店舗を新規作成。RLS が editor/admin 以外を拒否する。 */
+export async function createShop(v: ShopFormValues): Promise<string> {
+  const { data, error } = await getBrowserSupabase()
+    .from("shops")
+    .insert(shopRow(v))
+    .select("id")
+    .single();
+  if (error) throw shopWriteError(error.message);
+  return data.id as string;
+}
+
+/** 店舗を更新。 */
+export async function updateShop(id: string, v: ShopFormValues): Promise<void> {
+  const { error } = await getBrowserSupabase().from("shops").update(shopRow(v)).eq("id", id);
+  if (error) throw shopWriteError(error.message);
+}
+
+/** 店舗を削除（参照中レビューがあると FK 制約で失敗するのでメッセージを補足）。 */
+export async function deleteShop(id: string): Promise<void> {
+  const { error } = await getBrowserSupabase().from("shops").delete().eq("id", id);
+  if (error) {
+    if (/foreign key|violates|23503/i.test(error.message)) {
+      throw new Error("この店舗を参照しているレビューがあるため削除できません。先にレビューを削除/付け替えてください。");
+    }
+    throw new Error(error.message);
+  }
 }
 
 /** 編集対象を3テーブルから読み込む（有料本文は権限者のみRLSで取得可）。 */
