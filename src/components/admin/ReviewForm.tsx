@@ -9,10 +9,12 @@ import {
   reviewFormSchema,
   type ReviewFormValues,
 } from "@/lib/admin/reviewSchema";
-import { getAreaOptions, getShopOptions, type SelectOption } from "@/lib/repository/admin";
+import { getShopOptions, type ShopOption } from "@/lib/repository/admin";
 import { SCORE_DEFINITIONS } from "@/lib/scores";
 
 const SCORE_OPTIONS = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0];
+// 総合スコアは他8指標の平均で自動算出するため、入力欄からは除外する。
+const INPUT_SCORE_DEFINITIONS = SCORE_DEFINITIONS.filter((d) => d.key !== "overall");
 
 type Props = {
   defaultValues?: ReviewFormValues;
@@ -26,8 +28,7 @@ type Props = {
  * 有料本文フィールドは isPaid のときのみ入力。保存先の分離はリポジトリ層が担う。
  */
 export function ReviewForm({ defaultValues, onSubmit, submitting, serverError }: Props) {
-  const [areas, setAreas] = useState<SelectOption[]>([]);
-  const [shops, setShops] = useState<SelectOption[]>([]);
+  const [shops, setShops] = useState<ShopOption[]>([]);
 
   const {
     register,
@@ -44,9 +45,8 @@ export function ReviewForm({ defaultValues, onSubmit, submitting, serverError }:
 
   useEffect(() => {
     let active = true;
-    Promise.all([getAreaOptions(), getShopOptions()]).then(([a, s]) => {
+    getShopOptions().then((s) => {
       if (!active) return;
-      setAreas(a);
       setShops(s);
     });
     return () => {
@@ -80,19 +80,8 @@ export function ReviewForm({ defaultValues, onSubmit, submitting, serverError }:
             ))}
           </select>
         </Field>
-        <Field label="エリア" error={errors.areaId?.message}>
-          <select {...register("areaId")} className={inputCls}>
-            <option value="">選択してください</option>
-            {areas.map((a) => (
-              <option key={a.id} value={a.id}>{a.label}</option>
-            ))}
-          </select>
-        </Field>
         <Field label="タイトル" error={errors.title?.message}>
           <input type="text" {...register("title")} className={inputCls} />
-        </Field>
-        <Field label="slug（URL・英小文字/数字/ハイフン）" error={errors.slug?.message}>
-          <input type="text" {...register("slug")} className={inputCls} placeholder="osaka-umeda-sample" />
         </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="料金（円）" error={errors.price?.message}>
@@ -102,19 +91,12 @@ export function ReviewForm({ defaultValues, onSubmit, submitting, serverError }:
             <input type="number" inputMode="numeric" {...register("courseMinutes", { setValueAs: numberSetAs })} className={inputCls} />
           </Field>
         </div>
-        <Field label="訪問日">
-          <input type="date" {...register("visitDate")} className={inputCls} />
-        </Field>
-        <label className="flex items-center gap-2 text-sm text-ivory-100">
-          <input type="checkbox" {...register("isPr")} className="h-4 w-4" />
-          PR / 提供記事（記事上部にPR表記）
-        </label>
       </Section>
 
       {/* スコア */}
-      <Section title="スコア（9指標）">
+      <Section title="スコア（総合は自動計算）">
         <div className="grid grid-cols-2 gap-3">
-          {SCORE_DEFINITIONS.map((def) => (
+          {INPUT_SCORE_DEFINITIONS.map((def) => (
             <Field key={def.key} label={def.label}>
               <select {...register(def.key, { setValueAs: numberSetAs })} className={inputCls}>
                 <option value="">—</option>
@@ -169,13 +151,8 @@ export function ReviewForm({ defaultValues, onSubmit, submitting, serverError }:
               </select>
             </Field>
             <Field label="有料本文（Markdown可）" error={errors.paidBody?.message}>
-              <textarea {...register("paidBody")} rows={8} className={inputCls} />
+              <textarea {...register("paidBody")} rows={10} className={inputCls} />
             </Field>
-            <Field label="写真とのギャップ"><textarea {...register("photoGap")} rows={2} className={inputCls} /></Field>
-            <Field label="実際の満足度"><textarea {...register("satisfaction")} rows={2} className={inputCls} /></Field>
-            <Field label="再訪したいか"><textarea {...register("revisitOpinion")} rows={2} className={inputCls} /></Field>
-            <Field label="行く前の注意点"><textarea {...register("beginnerCaution")} rows={2} className={inputCls} /></Field>
-            <Field label="この店が刺さる人"><textarea {...register("targetType")} rows={2} className={inputCls} /></Field>
           </div>
         )}
       </Section>

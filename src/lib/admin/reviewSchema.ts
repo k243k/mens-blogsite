@@ -13,12 +13,11 @@ const scoreField = z
 export const reviewFormSchema = z.object({
   // 基本情報
   shopId: z.string().uuid({ message: "店舗を選択してください" }),
-  areaId: z.string().uuid({ message: "エリアを選択してください" }),
+  // エリアは店舗から自動解決、slug はタイトルから自動生成するためフォーム入力は不要。
+  // 値はリポジトリ層が必ず補完するので、ここでは空を許容する。
+  areaId: z.string().optional().or(z.literal("")).nullable(),
   title: z.string().min(1, "タイトルは必須です").max(120),
-  slug: z
-    .string()
-    .min(1, "slug は必須です")
-    .regex(/^[a-z0-9-]+$/, "slug は英小文字・数字・ハイフンのみ"),
+  slug: z.string().optional().or(z.literal("")).nullable(),
   visitDate: z.string().optional().nullable(),
   price: z.number().int().nonnegative().nullable(),
   courseMinutes: z.number().int().nonnegative().nullable(),

@@ -20,6 +20,9 @@ export type AdminReviewRow = {
 
 export type SelectOption = { id: string; label: string };
 
+/** 店舗選択肢（エリアID・slug 付き。記事のエリア自動設定と slug 自動生成に使う）。 */
+export type ShopOption = SelectOption & { areaId: string; slug: string };
+
 /** 編集可能なレビュー一覧（RLSで author/editor の見える範囲）。 */
 export async function getEditableReviews(): Promise<AdminReviewRow[]> {
   const { data, error } = await getBrowserSupabase()
@@ -47,11 +50,19 @@ export async function getAreaOptions(): Promise<SelectOption[]> {
   return (data ?? []).map((a) => ({ id: a.id, label: a.name }));
 }
 
-/** 店舗選択肢。 */
-export async function getShopOptions(): Promise<SelectOption[]> {
-  const { data, error } = await getBrowserSupabase().from("shops").select("id,name").order("name");
+/** 店舗選択肢（エリアID・slug 付き）。 */
+export async function getShopOptions(): Promise<ShopOption[]> {
+  const { data, error } = await getBrowserSupabase()
+    .from("shops")
+    .select("id,name,area_id,slug")
+    .order("name");
   if (error) throw new Error(error.message);
-  return (data ?? []).map((s) => ({ id: s.id, label: s.name }));
+  return (data ?? []).map((s) => ({
+    id: s.id,
+    label: s.name,
+    areaId: s.area_id ?? "",
+    slug: s.slug ?? "",
+  }));
 }
 
 // ---------------------------------------------------------------------------
@@ -243,10 +254,26 @@ function reviewRow(v: ReviewFormValues, authorId: string) {
   };
 }
 
+/** 総合スコアは他8指標の平均で自動算出（小数第1位四捨五入）。入力欄は廃止。 */
+function computeOverall(v: ReviewFormValues): number | null {
+  const xs = [
+    v.sensual,
+    v.cleanliness,
+    v.service,
+    v.distance,
+    v.photoAccuracy,
+    v.beginner,
+    v.cost,
+    v.revisit,
+  ].filter((x): x is number => x != null);
+  if (xs.length === 0) return null;
+  return Math.round((xs.reduce((a, b) => a + b, 0) / xs.length) * 10) / 10;
+}
+
 function scoresRow(v: ReviewFormValues, reviewId: string) {
   return {
     review_id: reviewId,
-    overall_score: v.overall,
+    overall_score: computeOverall(v),
     sensual_score: v.sensual,
     cleanliness_score: v.cleanliness,
     service_score: v.service,
@@ -277,6 +304,30 @@ async function requireUserId(): Promise<string> {
   return data.user.id;
 }
 
+/** 店舗の area_id / slug を取得（エリア自動設定・slug自動生成の元データ）。 */
+async function getShopMeta(shopId: string): Promise<{ areaId: string; slug: string }> {
+  const { data, error } = await getBrowserSupabase()
+    .from("shops")
+    .select("area_id,slug")
+    .eq("id", shopId)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("選択された店舗が見つかりません。");
+  return { areaId: data.area_id ?? "", slug: data.slug ?? "shop" };
+}
+
+/** 店舗slug + ランダム接尾辞で一意な記事slugを生成（手入力廃止）。衝突したら数回リトライ。 */
+async function generateUniqueSlug(shopSlug: string): Promise<string> {
+  const supabase = getBrowserSupabase();
+  for (let i = 0; i < 6; i++) {
+    const candidate = `${shopSlug}-${Math.random().toString(36).slice(2, 6)}`;
+    const { data } = await supabase.from("reviews").select("id").eq("slug", candidate).maybeSingle();
+    if (!data) return candidate;
+  }
+  // 万一すべて衝突したらタイムスタンプで確実に一意化。
+  return `${shopSlug}-${Date.now().toString(36)}`;
+}
+
 /**
  * 新規作成。reviews → review_scores →（有料なら）review_paid_contents の順に保存。
  * RLS が writer/editor/admin 以外を拒否する。
@@ -284,9 +335,12 @@ async function requireUserId(): Promise<string> {
 export async function createReview(v: ReviewFormValues): Promise<string> {
   const supabase = getBrowserSupabase();
   const authorId = await requireUserId();
+  // エリアと slug はフォーム入力を廃止し、店舗から自動解決・自動生成する。
+  const { areaId, slug } = await getShopMeta(v.shopId);
+  const generatedSlug = await generateUniqueSlug(slug);
   const { data, error } = await supabase
     .from("reviews")
-    .insert(reviewRow(v, authorId))
+    .insert({ ...reviewRow(v, authorId), area_id: areaId, slug: generatedSlug })
     .select("id")
     .single();
   if (error) throw new Error(error.message);
@@ -306,7 +360,12 @@ export async function createReview(v: ReviewFormValues): Promise<string> {
 export async function updateReview(id: string, v: ReviewFormValues): Promise<void> {
   const supabase = getBrowserSupabase();
   const authorId = await requireUserId();
-  const { error } = await supabase.from("reviews").update(reviewRow(v, authorId)).eq("id", id);
+  // 店舗変更に追従してエリアを再解決。slug は URL/SEO 維持のため既存値のまま（reviewRow が保持）。
+  const { areaId } = await getShopMeta(v.shopId);
+  const { error } = await supabase
+    .from("reviews")
+    .update({ ...reviewRow(v, authorId), area_id: areaId })
+    .eq("id", id);
   if (error) throw new Error(error.message);
 
   const { error: scErr } = await supabase
