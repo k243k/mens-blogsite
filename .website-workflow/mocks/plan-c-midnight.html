@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>案C ミッドナイト・シティガイド</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --night:#0C1018; --panel:#131926; --line:#26304A;
+    --white:#F2F4F8; --dim:#8E99B3;
+    --coral:#FF5A4E; --mint:#39D98A; --amber:#FFB648;
+  }
+  body { background:var(--night); color:var(--white); font-family:"Zen Kaku Gothic New", sans-serif; }
+  .mono { font-family:"IBM Plex Mono", monospace; }
+  .arch { font-family:"Archivo", sans-serif; }
+
+  .topbar { display:flex; justify-content:space-between; padding:10px 40px; font-size:12px; color:var(--dim); border-bottom:1px solid var(--line); }
+  .topbar .live { color:var(--mint); }
+  .topbar .live::before { content:"●"; margin-right:6px; animation:blink 1.6s infinite; }
+  @keyframes blink { 50%{opacity:0.3;} }
+
+  header { display:flex; justify-content:space-between; align-items:center; padding:20px 40px; }
+  .logo { display:flex; flex-direction:column; line-height:1; }
+  .logo .en { font-size:11px; letter-spacing:0.4em; color:var(--coral); font-weight:600; }
+  .logo .ja { font-size:26px; font-weight:900; letter-spacing:0.04em; margin-top:6px; }
+  nav { display:flex; gap:30px; font-size:14px; font-weight:700; }
+  nav a { color:var(--white); text-decoration:none; opacity:0.85; }
+  nav a.hot { color:var(--coral); opacity:1; }
+  .login { background:var(--coral); color:#0C1018; border:none; font-weight:900; font-size:13px; padding:10px 24px; border-radius:999px; }
+
+  .hero { padding:48px 40px 0; position:relative; overflow:hidden; }
+  .city-glow {
+    position:absolute; right:-120px; top:-60px; width:640px; height:640px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,90,78,0.16), transparent 62%); pointer-events:none;
+  }
+  .kicker { display:flex; gap:14px; align-items:center; font-size:12.5px; letter-spacing:0.3em; color:var(--dim); }
+  .kicker b { color:var(--coral); letter-spacing:0.3em; }
+  h1 { font-size:96px; font-weight:900; line-height:1.08; letter-spacing:0.01em; margin-top:18px; }
+  h1 .stroke { color:transparent; -webkit-text-stroke:2px var(--white); }
+  .lede { margin-top:22px; font-size:16px; line-height:2; color:var(--dim); max-width:38em; }
+  .lede b { color:var(--white); }
+  .cta-row { margin-top:34px; display:flex; gap:14px; align-items:center; }
+  .btn-p { background:var(--coral); color:#0C1018; font-size:15px; font-weight:900; padding:16px 36px; border:none; border-radius:999px; letter-spacing:0.06em; }
+  .btn-s { background:transparent; color:var(--white); font-size:15px; font-weight:700; padding:15px 30px; border:1.5px solid var(--line); border-radius:999px; }
+  .btn-s b { color:var(--coral); }
+
+  /* 路線ナビ */
+  .metro { margin-top:44px; border-top:1px solid var(--line); padding:20px 0 18px; display:flex; align-items:center; gap:0; }
+  .metro .lbl { font-size:11px; letter-spacing:0.26em; color:var(--dim); padding-right:26px; border-right:1px solid var(--line); margin-right:26px; white-space:nowrap; }
+  .stations { display:flex; align-items:center; flex:1; }
+  .station { display:flex; flex-direction:column; align-items:center; gap:8px; position:relative; flex:1; text-decoration:none; }
+  .station .dot { width:14px; height:14px; border-radius:50%; border:3px solid var(--coral); background:var(--night); z-index:1; }
+  .station.on .dot { background:var(--coral); box-shadow:0 0 14px rgba(255,90,78,0.8); }
+  .station .nm { font-size:13px; font-weight:700; color:var(--white); }
+  .station .ct { font-size:10.5px; color:var(--dim); }
+  .stations::before { content:""; position:absolute; height:3px; background:linear-gradient(90deg, var(--coral), rgba(255,90,78,0.25)); left:190px; right:40px; margin-top:-27px; }
+  .metro-wrap { position:relative; }
+
+  /* 横スクロールカード */
+  .rail { margin-top:8px; padding:26px 40px 44px; }
+  .rail-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:18px; }
+  .rail-head h2 { font-size:20px; font-weight:900; letter-spacing:0.06em; }
+  .rail-head h2 em { font-style:normal; color:var(--coral); }
+  .rail-head a { color:var(--dim); font-size:13px; text-decoration:none; }
+  .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; overflow:hidden; position:relative; }
+  .thumb { height:150px; position:relative; }
+  .thumb.t1 { background:linear-gradient(160deg,#3D1F2E, #16101E 70%); }
+  .thumb.t2 { background:linear-gradient(160deg,#1F2E3D, #101620 70%); }
+  .thumb.t3 { background:linear-gradient(160deg,#3D2E1F, #1E1610 70%); }
+  .thumb.t4 { background:linear-gradient(160deg,#2E1F3D, #14101E 70%); }
+  .thumb::after { content:""; position:absolute; inset:0; background:radial-gradient(circle at 70% 20%, rgba(255,90,78,0.22), transparent 55%); }
+  .rank { position:absolute; top:12px; left:14px; font-size:38px; font-weight:800; color:var(--white); opacity:0.95; z-index:1; }
+  .score-tag { position:absolute; right:12px; bottom:-14px; background:var(--coral); color:#0C1018; font-weight:900; font-size:15px; padding:8px 14px; border-radius:10px; z-index:2; }
+  .score-tag small { font-size:9.5px; display:block; font-weight:700; letter-spacing:0.08em; }
+  .card-body { padding:22px 18px 18px; }
+  .tags { display:flex; gap:8px; margin-bottom:10px; }
+  .tag { font-size:10.5px; font-weight:700; color:var(--dim); border:1px solid var(--line); border-radius:999px; padding:3px 10px; }
+  .tag.paid { color:var(--amber); border-color:rgba(255,182,72,0.4); }
+  .card h3 { font-size:15.5px; font-weight:700; line-height:1.65; }
+  .card .meta { margin-top:10px; font-size:12px; color:var(--dim); display:flex; justify-content:space-between; }
+</style>
+</head>
+<body>
+  <div class="topbar mono">
+    <span>OSAKA / KYOTO / TOKYO</span>
+    <span class="live">TONIGHT 22:00 — 営業中の記録 34 件</span>
+  </div>
+
+  <header>
+    <div class="logo arch">
+      <span class="en">MIDNIGHT GUIDE</span>
+      <span class="ja" style="font-family:'Zen Kaku Gothic New'">夜の答え合わせ</span>
+    </div>
+    <nav>
+      <a href="#" class="hot">今夜のベスト</a><a href="#">全レビュー</a><a href="#">エリア</a><a href="#">ランキング</a>
+    </nav>
+    <button class="login">ログイン</button>
+  </header>
+
+  <section class="hero">
+    <div class="city-glow"></div>
+    <div class="kicker mono"><b>128 REVIEWS</b><span>実体験だけのシティガイド</span></div>
+    <h1>夜の街に、<br><span class="stroke">答え</span>を持て。</h1>
+    <p class="lede">口コミは当てにならない。公式写真はもっと当てにならない。<b>128軒を自分の金で回った男</b>が、料金・雰囲気・写真とのギャップを答え合わせしていくナイトガイド。<b>あなたの今夜を、外させない。</b></p>
+    <div class="cta-row">
+      <button class="btn-p">今夜のベストを見る</button>
+      <button class="btn-s">本音レビュー <b>¥300〜</b></button>
+    </div>
+
+    <div class="metro-wrap">
+      <div class="metro">
+        <span class="lbl mono">AREA LINE</span>
+        <div class="stations">
+          <a class="station on" href="#"><span class="dot"></span><span class="nm">梅田</span><span class="ct mono">32</span></a>
+          <a class="station" href="#"><span class="dot"></span><span class="nm">難波</span><span class="ct mono">24</span></a>
+          <a class="station" href="#"><span class="dot"></span><span class="nm">心斎橋</span><span class="ct mono">18</span></a>
+          <a class="station" href="#"><span class="dot"></span><span class="nm">京都</span><span class="ct mono">15</span></a>
+          <a class="station" href="#"><span class="dot"></span><span class="nm">新宿</span><span class="ct mono">21</span></a>
+          <a class="station" href="#"><span class="dot"></span><span class="nm">渋谷</span><span class="ct mono">12</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rail">
+    <div class="rail-head">
+      <h2>TONIGHT'S <em>BEST 4</em> — 今夜ハズさない4軒</h2>
+      <a href="#" class="mono">ALL REVIEWS →</a>
+    </div>
+    <div class="cards">
+      <article class="card">
+        <div class="thumb t1"><span class="rank arch">1</span><span class="score-tag">4.8<small>OVERALL</small></span></div>
+        <div class="card-body">
+          <div class="tags"><span class="tag">京都</span><span class="tag">¥24,000/120min</span><span class="tag paid">¥ 本音あり</span></div>
+          <h3>静かな熱。値段以上だった一軒の全記録</h3>
+          <div class="meta"><span>色気 4.9 / 清潔 4.7</span><span class="mono">06.14</span></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="thumb t2"><span class="rank arch">2</span><span class="score-tag">4.5<small>OVERALL</small></span></div>
+        <div class="card-body">
+          <div class="tags"><span class="tag">梅田</span><span class="tag">¥18,000/90min</span></div>
+          <h3>写真通りは本当。ただし指名料の罠に注意</h3>
+          <div class="meta"><span>色気 4.4 / 再訪 4.6</span><span class="mono">06.28</span></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="thumb t3"><span class="rank arch">3</span><span class="score-tag">4.2<small>OVERALL</small></span></div>
+        <div class="card-body">
+          <div class="tags"><span class="tag">渋谷</span><span class="tag">¥15,000/70min</span><span class="tag paid">¥ 本音あり</span></div>
+          <h3>初心者の一軒目はここでいい。理由は3つ</h3>
+          <div class="meta"><span>初心者 4.8 / 接客 4.3</span><span class="mono">05.30</span></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="thumb t4"><span class="rank arch">4</span><span class="score-tag">4.1<small>OVERALL</small></span></div>
+        <div class="card-body">
+          <div class="tags"><span class="tag">新宿</span><span class="tag">¥16,000/90min</span></div>
+          <h3>広告と実態のギャップを実測してきた</h3>
+          <div class="meta"><span>写真再現 3.2 / コスパ 4.0</span><span class="mono">06.07</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+</body>
+</html>

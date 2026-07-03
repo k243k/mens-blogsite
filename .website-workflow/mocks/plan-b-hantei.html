@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>案B 判定室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Oswald:wght@500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --bg:#FBFBF8; --ink:#0F1720; --ink-2:#475266; --line:#E2E4DD;
+    --go:#0E7A4E; --hold:#B97B0B; --skip:#B3261E; --navy:#14263F;
+  }
+  body { background:var(--bg); color:var(--ink); font-family:"Noto Sans JP", sans-serif; }
+  .mono { font-family:"IBM Plex Mono", monospace; }
+  .osw { font-family:"Oswald", sans-serif; }
+
+  .ticker { background:var(--ink); color:#E8EAE3; font-size:12.5px; padding:9px 0; overflow:hidden; white-space:nowrap; }
+  .ticker span { margin:0 26px; letter-spacing:0.04em; }
+  .ticker b.go{color:#5BD69B;} .ticker b.skip{color:#FF8A80;} .ticker b.hold{color:#FFCF6E;}
+
+  header {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:18px 44px; border-bottom:2px solid var(--ink); background:#fff;
+  }
+  .logo { display:flex; align-items:center; gap:12px; }
+  .logo .mark { background:var(--skip); color:#fff; font-weight:900; font-size:15px; padding:6px 10px; letter-spacing:0.06em; }
+  .logo .name { font-size:21px; font-weight:900; letter-spacing:0.06em; }
+  .logo .sub { font-size:10.5px; color:var(--ink-2); letter-spacing:0.22em; margin-left:4px; }
+  nav { display:flex; gap:28px; font-size:14px; font-weight:700; }
+  nav a { color:var(--ink); text-decoration:none; }
+  nav a small { color:var(--skip); font-size:10px; vertical-align:super; }
+  .login { font-size:13px; font-weight:700; background:var(--ink); color:#fff; padding:10px 22px; border:none; }
+
+  .hero { display:grid; grid-template-columns: 1.25fr 1fr; }
+  .hero-main { padding:64px 44px 56px; border-right:2px solid var(--ink); }
+  .flag { display:inline-flex; align-items:center; gap:10px; font-size:12px; font-weight:700; letter-spacing:0.18em; color:var(--ink-2); margin-bottom:24px; }
+  .flag::before { content:""; width:10px; height:10px; background:var(--skip); }
+  h1 { font-size:58px; line-height:1.24; font-weight:900; letter-spacing:0.01em; }
+  h1 .u { box-shadow: inset 0 -0.28em 0 rgba(179,38,30,0.22); }
+  .lede { margin-top:24px; font-size:15.5px; line-height:2; color:var(--ink-2); max-width:36em; }
+  .lede b { color:var(--ink); }
+  .verdict-legend { margin-top:34px; display:flex; gap:12px; }
+  .v-chip { display:flex; align-items:center; gap:8px; border:1.5px solid var(--ink); padding:10px 18px; font-size:14px; font-weight:900; background:#fff; }
+  .v-chip .d { width:11px; height:11px; border-radius:50%; }
+  .v-chip.go .d{background:var(--go);} .v-chip.hold .d{background:var(--hold);} .v-chip.skip .d{background:var(--skip);}
+  .v-chip small { font-weight:500; font-size:11px; color:var(--ink-2); }
+  .cta-row { margin-top:36px; display:flex; gap:14px; }
+  .btn-p { background:var(--skip); color:#fff; font-size:15px; font-weight:900; padding:16px 34px; border:2px solid var(--skip); letter-spacing:0.08em; }
+  .btn-s { background:#fff; color:var(--ink); font-size:15px; font-weight:700; padding:16px 28px; border:2px solid var(--ink); }
+
+  /* 右：検索パネル＋判定ボード */
+  .hero-side { background:#F1F0EA; }
+  .search-panel { padding:28px 36px; border-bottom:2px solid var(--ink); background:var(--navy); color:#fff; }
+  .search-panel h2 { font-size:15px; font-weight:900; letter-spacing:0.14em; margin-bottom:16px; }
+  .search-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .sel { background:#fff; color:var(--ink); font-size:13.5px; padding:12px 14px; border:none; display:flex; justify-content:space-between; font-weight:500; }
+  .sel span:last-child { color:var(--ink-2); }
+  .search-go { grid-column:1/-1; background:#FF5A47; color:#fff; font-weight:900; font-size:14.5px; padding:13px; border:none; letter-spacing:0.14em; }
+  .board { padding:26px 36px; }
+  .board h2 { font-size:14px; font-weight:900; letter-spacing:0.16em; color:var(--ink-2); margin-bottom:14px; display:flex; justify-content:space-between; }
+  .board h2 a { color:var(--skip); text-decoration:none; font-size:12px; }
+  table { width:100%; border-collapse:collapse; background:#fff; border:1.5px solid var(--ink); }
+  th { font-size:10.5px; letter-spacing:0.12em; color:var(--ink-2); text-align:left; padding:9px 12px; border-bottom:1.5px solid var(--ink); background:#F7F6F1; }
+  td { font-size:13.5px; padding:11px 12px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  tr:last-child td { border-bottom:none; }
+  td .shop { font-weight:700; }
+  td .area { font-size:11px; color:var(--ink-2); display:block; margin-top:1px; }
+  .badge { display:inline-block; font-size:11.5px; font-weight:900; padding:4px 10px; color:#fff; letter-spacing:0.08em; }
+  .badge.go{background:var(--go);} .badge.hold{background:var(--hold);} .badge.skip{background:var(--skip);}
+  .score { font-weight:600; }
+  .bar { height:5px; width:64px; background:var(--line); margin-top:4px; position:relative; }
+  .bar i { position:absolute; inset:0; right:auto; background:var(--ink); }
+  .lock { font-size:11px; color:var(--ink-2); }
+</style>
+</head>
+<body>
+  <div class="ticker mono">
+    <span>06.28 梅田 A店 <b class="go">判定: 行け</b> 総合4.5</span>
+    <span>06.21 難波 B店 <b class="skip">判定: 見送れ</b> 総合2.8</span>
+    <span>06.14 京都 C店 <b class="go">判定: 行け</b> 総合4.8</span>
+    <span>06.07 新宿 D店 <b class="hold">判定: 様子見</b> 総合3.4</span>
+    <span>05.30 渋谷 E店 <b class="go">判定: 行け</b> 総合4.2</span>
+  </div>
+
+  <header>
+    <div class="logo">
+      <span class="mark">判</span>
+      <span class="name">メンエス判定室</span>
+      <span class="sub mono">GO / HOLD / SKIP</span>
+    </div>
+    <nav>
+      <a href="#">判定一覧</a><a href="#">エリア別</a><a href="#">番付表</a><a href="#">判定基準</a>
+    </nav>
+    <button class="login">ログイン</button>
+  </header>
+
+  <section class="hero">
+    <div class="hero-main">
+      <div class="flag">実訪128軒のデータと経験で判定</div>
+      <h1>感想はいらない。<br><span class="u">判定</span>が欲しい。</h1>
+      <p class="lede">雰囲気が良かった、では店は選べません。ここでは全記録を<b>「行け／様子見／見送れ」の三段判定</b>で出します。判定の根拠は、私が自腹で128軒踏んできた失敗と成功。<b>あなたには最短で当たりだけ引かせます。</b></p>
+      <div class="verdict-legend">
+        <div class="v-chip go"><span class="d"></span>行け<small>＝金を払う価値あり</small></div>
+        <div class="v-chip hold"><span class="d"></span>様子見<small>＝条件次第</small></div>
+        <div class="v-chip skip"><span class="d"></span>見送れ<small>＝私が代わりに失敗済</small></div>
+      </div>
+      <div class="cta-row">
+        <button class="btn-p">今夜の判定を見る</button>
+        <button class="btn-s">エリアから探す</button>
+      </div>
+    </div>
+    <aside class="hero-side">
+      <div class="search-panel">
+        <h2>条件で探す</h2>
+        <div class="search-grid">
+          <div class="sel"><span>エリア</span><span>梅田 ▾</span></div>
+          <div class="sel"><span>予算</span><span>〜15,000円 ▾</span></div>
+          <div class="sel"><span>判定</span><span>行け のみ ▾</span></div>
+          <div class="sel"><span>初心者OK</span><span>指定なし ▾</span></div>
+          <button class="search-go">該当 12 件を表示 →</button>
+        </div>
+      </div>
+      <div class="board">
+        <h2>直近の判定 <a href="#">全128件 →</a></h2>
+        <table>
+          <tr><th>店 / エリア</th><th>判定</th><th>総合</th><th>料金</th></tr>
+          <tr>
+            <td><span class="shop">A店</span><span class="area">梅田・06.28訪問</span></td>
+            <td><span class="badge go">行け</span></td>
+            <td><span class="score mono">4.5</span><div class="bar"><i style="width:90%"></i></div></td>
+            <td class="mono">¥18,000</td>
+          </tr>
+          <tr>
+            <td><span class="shop">B店</span><span class="area">難波・06.21訪問</span></td>
+            <td><span class="badge skip">見送れ</span></td>
+            <td><span class="score mono">2.8</span><div class="bar"><i style="width:56%"></i></div></td>
+            <td class="mono">¥13,000</td>
+          </tr>
+          <tr>
+            <td><span class="shop">C店</span><span class="area">京都・06.14訪問 <span class="lock">本音は有料</span></span></td>
+            <td><span class="badge go">行け</span></td>
+            <td><span class="score mono">4.8</span><div class="bar"><i style="width:96%"></i></div></td>
+            <td class="mono">¥24,000</td>
+          </tr>
+          <tr>
+            <td><span class="shop">D店</span><span class="area">新宿・06.07訪問</span></td>
+            <td><span class="badge hold">様子見</span></td>
+            <td><span class="score mono">3.4</span><div class="bar"><i style="width:68%"></i></div></td>
+            <td class="mono">¥16,000</td>
+          </tr>
+        </table>
+      </div>
+    </aside>
+  </section>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>案A 先達の手帖</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --paper:#F6F1E7; --paper-deep:#EFE7D8; --ink:#231D15; --ink-soft:#5C5346;
+    --shu:#B93A26; --shu-deep:#932C1C; --seal:#C0392B; --line:#D9CDB8;
+  }
+  body {
+    background:var(--paper); color:var(--ink);
+    font-family:"Zen Kaku Gothic New", sans-serif;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(35,29,21,0.045) 31px, rgba(35,29,21,0.045) 32px);
+  }
+  .serif { font-family:"Shippori Mincho B1", serif; }
+  .mono { font-family:"IBM Plex Mono", monospace; }
+
+  header {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:20px 48px; border-bottom:1px solid var(--ink);
+  }
+  .logo { display:flex; align-items:baseline; gap:14px; }
+  .logo .name { font-size:24px; font-weight:800; letter-spacing:0.08em; }
+  .logo .sub { font-size:11px; letter-spacing:0.28em; color:var(--ink-soft); }
+  nav { display:flex; gap:32px; font-size:14px; font-weight:500; letter-spacing:0.1em; }
+  nav a { color:var(--ink); text-decoration:none; padding-bottom:2px; }
+  nav a.on { border-bottom:2px solid var(--shu); }
+  .login {
+    font-size:13px; border:1px solid var(--ink); padding:8px 20px; border-radius:2px;
+    background:transparent; letter-spacing:0.1em;
+  }
+
+  .hero { display:grid; grid-template-columns: 1fr 460px; gap:0; border-bottom:1px solid var(--ink); }
+  .hero-main { padding:72px 48px 64px; position:relative; }
+  .kicker { display:flex; align-items:center; gap:16px; margin-bottom:28px; }
+  .kicker .no { font-size:12px; letter-spacing:0.2em; color:var(--shu); font-weight:700; }
+  .kicker .rule { width:64px; height:1px; background:var(--shu); }
+  h1 { font-size:64px; line-height:1.28; font-weight:800; letter-spacing:0.02em; }
+  h1 .shu { color:var(--shu); }
+  .lede { margin-top:28px; font-size:16px; line-height:2.1; color:var(--ink-soft); max-width:34em; }
+  .lede strong { color:var(--ink); font-weight:700; }
+  .cta-row { margin-top:40px; display:flex; gap:16px; align-items:center; }
+  .btn-p {
+    background:var(--ink); color:var(--paper); font-size:15px; font-weight:700;
+    padding:16px 36px; border-radius:2px; letter-spacing:0.12em; border:1px solid var(--ink);
+  }
+  .btn-s {
+    background:transparent; color:var(--ink); font-size:15px; font-weight:500;
+    padding:16px 30px; border-radius:2px; letter-spacing:0.12em; border:1px solid var(--ink);
+  }
+  .counter-strip { margin-top:52px; display:flex; gap:0; border:1px solid var(--ink); width:fit-content; background:#FDFAF3; }
+  .counter { padding:14px 28px; border-right:1px solid var(--line); }
+  .counter:last-child { border-right:none; }
+  .counter .v { font-size:24px; font-weight:700; }
+  .counter .v em { font-style:normal; font-size:13px; margin-left:2px; }
+  .counter .k { font-size:11px; letter-spacing:0.18em; color:var(--ink-soft); margin-top:2px; }
+
+  /* 右：最新の記録（手帖の切り抜き） */
+  .hero-side { border-left:1px solid var(--ink); background:var(--paper-deep); padding:36px 32px; }
+  .side-title { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:20px; }
+  .side-title h2 { font-size:16px; font-weight:800; letter-spacing:0.14em; }
+  .side-title a { font-size:12px; color:var(--shu); text-decoration:none; letter-spacing:0.1em; }
+  .rec {
+    background:#FDFAF3; border:1px solid var(--line); padding:18px 20px 16px; margin-bottom:14px;
+    position:relative; box-shadow:2px 2px 0 rgba(35,29,21,0.08);
+  }
+  .rec .date { font-size:11px; letter-spacing:0.16em; color:var(--ink-soft); }
+  .rec .no { position:absolute; top:14px; right:16px; font-size:11px; color:var(--shu); letter-spacing:0.08em; }
+  .rec h3 { font-size:16px; font-weight:700; margin-top:6px; line-height:1.6; padding-right:56px; }
+  .rec .meta { margin-top:8px; font-size:12px; color:var(--ink-soft); display:flex; gap:12px; }
+  .hanko {
+    position:absolute; right:14px; bottom:12px; width:52px; height:52px; border:2.5px solid var(--seal);
+    border-radius:50%; color:var(--seal); display:flex; flex-direction:column; align-items:center; justify-content:center;
+    transform:rotate(-8deg); opacity:0.9; background:rgba(192,57,43,0.04);
+  }
+  .hanko .s { font-size:16px; font-weight:800; line-height:1; }
+  .hanko .l { font-size:8px; letter-spacing:0.1em; margin-top:2px; }
+  .rec.locked h3::before { content:"有料 "; font-size:12px; color:var(--shu); border:1px solid var(--shu); padding:1px 6px; margin-right:6px; border-radius:2px; }
+
+  /* 下段：エリア索引 */
+  .index-strip { display:flex; align-items:center; padding:22px 48px; gap:28px; }
+  .index-strip .label { font-size:13px; font-weight:800; letter-spacing:0.2em; writing-mode:horizontal-tb; border-right:1px solid var(--ink); padding-right:28px; }
+  .index-strip .areas { display:flex; gap:10px; flex-wrap:wrap; }
+  .area-tag {
+    font-size:13px; padding:8px 18px; border:1px solid var(--ink-soft); border-radius:999px;
+    color:var(--ink); text-decoration:none; background:#FDFAF3;
+  }
+  .area-tag em { font-style:normal; color:var(--shu); font-size:11px; margin-left:6px; font-weight:700; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="logo serif">
+      <span class="name">外さぬ手帖</span>
+      <span class="sub">MEN'S ESTHE FIELD NOTES</span>
+    </div>
+    <nav>
+      <a href="#" class="on">記録一覧</a><a href="#">エリア索引</a><a href="#">番付</a><a href="#">この手帖について</a>
+    </nav>
+    <button class="login">ログイン</button>
+  </header>
+
+  <section class="hero">
+    <div class="hero-main">
+      <div class="kicker mono"><span class="no">FIELD NOTES — since 2024</span><span class="rule"></span></div>
+      <h1 class="serif">先に、<span class="shu">失敗</span>して<br>おきました。</h1>
+      <p class="lede">写真と違う。値段に見合わない。初心者に冷たい——<strong>そういう店を、私が先に踏んできた。</strong><br>この手帖は、あなたが今夜を外さないための訪問記録です。料金・清潔感・写真とのギャップ、全部そのまま書いています。</p>
+      <div class="cta-row">
+        <button class="btn-p">記録を読む</button>
+        <button class="btn-s">エリアから探す</button>
+      </div>
+      <div class="counter-strip">
+        <div class="counter"><div class="v mono">128<em>軒</em></div><div class="k">訪問記録</div></div>
+        <div class="counter"><div class="v mono">41<em>軒</em></div><div class="k">再訪した店</div></div>
+        <div class="counter"><div class="v mono">23<em>軒</em></div><div class="k">二度と行かない</div></div>
+      </div>
+    </div>
+    <aside class="hero-side">
+      <div class="side-title serif"><h2>最新の記録</h2><a href="#">すべて見る →</a></div>
+      <article class="rec">
+        <div class="date mono">2026.06.28 訪問</div><div class="no mono">記録 No.128</div>
+        <h3>梅田・A店 — 写真通りは本当。ただし指名料に注意</h3>
+        <div class="meta"><span>90分 18,000円</span><span>梅田</span></div>
+        <div class="hanko serif"><span class="s">4.5</span><span class="l">再訪確定</span></div>
+      </article>
+      <article class="rec locked">
+        <div class="date mono">2026.06.21 訪問</div><div class="no mono">記録 No.127</div>
+        <h3>難波・B店 — 初心者が最初に行くべきではない理由</h3>
+        <div class="meta"><span>60分 13,000円</span><span>難波</span></div>
+        <div class="hanko serif"><span class="s">2.8</span><span class="l">見送り</span></div>
+      </article>
+      <article class="rec">
+        <div class="date mono">2026.06.14 訪問</div><div class="no mono">記録 No.126</div>
+        <h3>京都・C店 — 静かな熱。値段以上だった一軒</h3>
+        <div class="meta"><span>120分 24,000円</span><span>京都</span></div>
+        <div class="hanko serif"><span class="s">4.8</span><span class="l">再訪確定</span></div>
+      </article>
+    </aside>
+  </section>
+
+  <div class="index-strip">
+    <span class="label serif">エリア索引</span>
+    <div class="areas">
+      <a class="area-tag" href="#">梅田<em>32</em></a>
+      <a class="area-tag" href="#">難波<em>24</em></a>
+      <a class="area-tag" href="#">心斎橋<em>18</em></a>
+      <a class="area-tag" href="#">京都<em>15</em></a>
+      <a class="area-tag" href="#">新宿<em>21</em></a>
+      <a class="area-tag" href="#">渋谷<em>12</em></a>
+      <a class="area-tag" href="#">名古屋<em>6</em></a>
+    </div>
+  </div>
+</body>
+</html>
